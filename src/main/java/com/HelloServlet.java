@@ -1,4 +1,4 @@
-package com.datawarehouse.datawarehouse;
+package com;
 
 import java.io.*;
 
