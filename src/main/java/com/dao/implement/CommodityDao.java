@@ -15,12 +15,17 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
     }
 
     @Override
-    public void loadDataInFile(String path) {
+    public void loadToStaging(String path) {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add("load data infile ?");
         joiner.add("into table staging");
         joiner.add("FIELDS TERMINATED BY ','");
-        joiner.add("(commodity_name, price, daily, weekly, monthly, yearly)");
-        load(joiner.toString(), path);
+        joiner.add("(natural_key, commodity_name, price, percent, created_date)");
+        useProcedure(joiner.toString(), path);
+    }
+
+    @Override
+    public void transformStaging() {
+
     }
 }

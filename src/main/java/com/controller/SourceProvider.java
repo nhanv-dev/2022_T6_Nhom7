@@ -1,6 +1,8 @@
 package com.controller;
 
 import com.model.Configuration;
+import com.util.PathGenerator;
+import com.util.SlugGenerator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,17 +13,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Objects;
 
 public class SourceProvider {
-    public boolean extract(Configuration configuration) {
-        if (configuration.getProperty("method").equalsIgnoreCase("jsoup")) return this.extractBySelector(configuration);
+
+    public boolean extract(Configuration configuration, String path) {
+        if (configuration.getProperty("method").equalsIgnoreCase("jsoup"))
+            return this.extractBySelector(configuration, path);
         return false;
     }
 
-    private boolean extractBySelector(Configuration configuration) {
+    private boolean extractBySelector(Configuration configuration, String path) {
         try {
-            String path = modifiedPath(configuration.getProperty("directory"), configuration.getProperty("name"));
             File file = new File(path);
             if (file.exists()) file.delete();
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
@@ -29,9 +31,17 @@ public class SourceProvider {
             Elements rows = doc.select(configuration.getProperty("selector_row"));
             for (Element row : rows) {
                 StringBuilder output = new StringBuilder();
+                String naturalKey = configuration.getProperty("natural_key");
+                boolean hasCreatedDate = configuration.getProperty("created_date") != null;
                 for (Map.Entry<String, String> selector : configuration.getColumns().entrySet()) {
-                    output.append(Objects.requireNonNull(row.select(selector.getValue()).first()).text().replaceAll("%", "")).append(",");
+                    Element element = row.select(selector.getValue()).first();
+                    if (element != null) {
+                        if (selector.getKey().equalsIgnoreCase(naturalKey))
+                            output.append(SlugGenerator.toSlug(element.text())).append(",");
+                        output.append(element.text().replaceAll("%", "")).append(",");
+                    }
                 }
+                if (hasCreatedDate) output.append(this.getCreatedDate());
                 writer.println(output);
                 writer.flush();
             }
@@ -42,9 +52,10 @@ public class SourceProvider {
         }
     }
 
-    public String modifiedPath(String directory, String name) {
+    private String getCreatedDate() {
         Date date = new Date(System.currentTimeMillis());
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
-        return directory + "/" + name + "-" + dateFormat.format(date) + ".csv";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        return dateFormat.format(date);
     }
+
 }
