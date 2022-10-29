@@ -28,6 +28,7 @@ public class SourceProvider {
             if (file.exists()) file.delete();
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
             Document doc = Jsoup.connect(configuration.getSource()).get();
+//            Element container= doc.select(configuration.getProperty("selector_container")).first();
             Elements rows = doc.select(configuration.getProperty("selector_row"));
             for (Element row : rows) {
                 StringBuilder output = new StringBuilder();
@@ -38,9 +39,7 @@ public class SourceProvider {
                     if (element != null) {
                         if (selector.getKey().equalsIgnoreCase(naturalKey))
                             output.append(SlugGenerator.toSlug(element.text())).append(",");
-
                         output.append(element.text().replaceAll("%|,", "")).append(",");
-
                     }
                 }
                 if (hasCreatedDate) output.append(this.getCreatedDate());

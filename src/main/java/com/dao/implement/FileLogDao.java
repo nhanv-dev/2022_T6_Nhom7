@@ -8,11 +8,10 @@ import java.util.StringJoiner;
 public class FileLogDao extends AbstractDao<Commodity> implements IFileLogDao {
 
     @Override
-    public int insert(int configId, String path, String status, int authorId) {
+    public long insert(int configId, String path, String status, int authorId) {
         StringJoiner joiner = new StringJoiner(" ");
-        joiner.add("insert into file_log ()");
-        joiner.add("values (?,?,?,?)");
-        return 0;
+        joiner.add("call insert_file_log(?,?,?,?,?)");
+        return insert(joiner.toString(), DatabaseConnector.CONTROLLER, configId, path, status, authorId);
     }
 
     @Override
