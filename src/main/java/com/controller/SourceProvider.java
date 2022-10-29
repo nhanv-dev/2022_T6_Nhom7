@@ -30,7 +30,10 @@ public class SourceProvider {
             for (Element row : rows) {
                 StringBuilder output = new StringBuilder();
                 for (Map.Entry<String, String> selector : configuration.getColumns().entrySet()) {
-                    output.append(Objects.requireNonNull(row.select(selector.getValue()).first()).text().replaceAll("%", "")).append(",");
+                    Element element = row.select(selector.getValue()).first();
+                    if (element != null) {
+                        output.append(element.text().replaceAll("%|,", "")).append(",");
+                    }
                 }
                 writer.println(output);
                 writer.flush();
