@@ -8,12 +8,6 @@ import java.util.StringJoiner;
 
 public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDao {
 
-
-    @Override
-    public void insertAll(List<Commodity> commodities) {
-
-    }
-
     @Override
     public void loadToStaging(String path) {
         StringJoiner joiner = new StringJoiner(" ");
@@ -21,11 +15,17 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
         joiner.add("into table staging");
         joiner.add("FIELDS TERMINATED BY ','");
         joiner.add("(natural_key, commodity_name, price, percent, created_date)");
-        useProcedure(joiner.toString(), path);
+        useProcedure(joiner.toString(), DatabaseConnector.STAGING, null, path);
     }
 
     @Override
     public void transformStaging() {
 
     }
+
+    @Override
+    public void truncateStaging() {
+
+    }
+
 }

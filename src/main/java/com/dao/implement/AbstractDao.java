@@ -15,7 +15,7 @@ public abstract class AbstractDao<T> implements GenericDao<T> {
     public List<T> query(String sql, String database, IRowMapper<T> rowMapper, Object... parameters) {
         List<T> results = new ArrayList<T>();
         try {
-            Connection connection = new DatabaseConnector().getConnection(database);
+            Connection connection = DatabaseConnector.getConnection(database);
             PreparedStatement statement = connection.prepareStatement(sql);
             ParameterSetter.setParameters(statement, parameters);
             ResultSet resultSet = statement.executeQuery();
@@ -33,12 +33,17 @@ public abstract class AbstractDao<T> implements GenericDao<T> {
     public List<T> useProcedure(String sql, String database, IRowMapper<T> rowMapper, Object... parameters) {
         List<T> results = new ArrayList<T>();
         try {
-            Connection connection = new DatabaseConnector().getConnection(database);
+            Connection connection = DatabaseConnector.getConnection(database);
+            assert connection != null;
             CallableStatement statement = connection.prepareCall(sql);
             ParameterSetter.setParameters(statement, parameters);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next() && rowMapper != null)
-                results.add(rowMapper.mapRow(resultSet));
+            if (rowMapper == null) {
+                statement.executeUpdate();
+            } else {
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next())
+                    results.add(rowMapper.mapRow(resultSet));
+            }
             statement.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,23 +52,21 @@ public abstract class AbstractDao<T> implements GenericDao<T> {
     }
 
     @Override
-    public void useProcedure(String sql, String database, Object... parameters) {
-        Connection connection = null;
+    public long insert(String sql, String database, Object... parameters) {
+        long id = -1;
         try {
-            connection = new DatabaseConnector().getConnection(database);
+            Connection connection = DatabaseConnector.getConnection(database);
+            assert connection != null;
             CallableStatement statement = connection.prepareCall(sql);
-            connection.setAutoCommit(false);
             ParameterSetter.setParameters(statement, parameters);
+            statement.registerOutParameter("id", java.sql.Types.INTEGER);
             statement.executeUpdate();
-            connection.commit();
+            id = (long) statement.getObject("id");
             statement.close();
+            return id;
         } catch (Exception e) {
             e.printStackTrace();
-            try {
-                if (connection != null) connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
         }
+        return id;
     }
 }

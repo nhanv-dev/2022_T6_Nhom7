@@ -8,7 +8,12 @@ public class CommodityService implements ICommodityService {
     private final ICommodityDao commodityDao = new CommodityDao();
 
     @Override
-    public void insertAll() {
-        commodityDao.insertAll(null);
+    public void loadToStaging(String path) {
+        commodityDao.loadToStaging(path);
+    }
+
+    @Override
+    public void truncateStaging() {
+        commodityDao.truncateStaging();
     }
 }
