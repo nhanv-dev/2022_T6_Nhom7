@@ -32,7 +32,7 @@ public class Main {
         int logId = fileLogService.insert(configId, path, FileLog.EXTRACT_STATUS, 1);
 
         // Load to staging
-        commodityDao.loadDataInFile(path);
+        commodityDao.loadToStaging(path);
 
 
         Trasnformer trasnformer = new Trasnformer();
