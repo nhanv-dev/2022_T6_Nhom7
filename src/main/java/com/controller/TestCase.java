@@ -25,7 +25,7 @@ public class TestCase {
         configuration.addProperty("selector_col_4", "td:nth-child(5)");
 
         SourceProvider provider = new SourceProvider();
-        System.out.println(provider.extract(configuration));
+        System.out.println(provider.extract(configuration,""));
 //        ICommodityDao commodityDao = new CommodityDao();
 //        commodityDao.loadDataInFile("C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/tradingeconomics-20221007110622.csv");
 
