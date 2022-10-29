@@ -38,7 +38,9 @@ public class SourceProvider {
                     if (element != null) {
                         if (selector.getKey().equalsIgnoreCase(naturalKey))
                             output.append(SlugGenerator.toSlug(element.text())).append(",");
-                        output.append(element.text().replaceAll("%", "")).append(",");
+
+                        output.append(element.text().replaceAll("%|,", "")).append(",");
+
                     }
                 }
                 if (hasCreatedDate) output.append(this.getCreatedDate());
