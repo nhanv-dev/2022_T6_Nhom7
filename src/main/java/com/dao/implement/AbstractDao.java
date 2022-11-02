@@ -16,6 +16,7 @@ public abstract class AbstractDao<T> implements GenericDao<T> {
         List<T> results = new ArrayList<T>();
         try {
             Connection connection = DatabaseConnector.getConnection(database);
+            assert connection != null;
             PreparedStatement statement = connection.prepareStatement(sql);
             ParameterSetter.setParameters(statement, parameters);
             ResultSet resultSet = statement.executeQuery();

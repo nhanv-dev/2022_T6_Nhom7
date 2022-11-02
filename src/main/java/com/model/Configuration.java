@@ -1,6 +1,9 @@
 package com.model;
 
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -10,10 +13,20 @@ public class Configuration {
     private Map<String, String> properties;
 
     public Configuration() {
-        this.properties = new TreeMap<>();
+        try {
+            this.properties = new TreeMap<>();
+            Properties prop = new Properties();
+            FileInputStream fis = new FileInputStream(".config");
+            prop.load(fis);
+            for (Map.Entry<Object, Object> entry : prop.entrySet())
+                properties.put((String) entry.getKey(), (String) entry.getValue());
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public String modifiedPath() {
+    public String generatePath() {
         String directory = this.getProperty("directory");
         String name = this.getProperty("name");
         Date date = new Date(System.currentTimeMillis());

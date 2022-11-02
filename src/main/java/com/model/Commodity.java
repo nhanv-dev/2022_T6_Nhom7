@@ -1,35 +1,50 @@
 package com.model;
 
+import com.util.SlugGenerator;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Commodity {
-    private String name;
-    private double price, daily, weekly, monthly, yearly;
-    private Date createdDate;
+    private String naturalKey, name, unit, category;
+    private double price, percent;
+    private Date createdDate, expiredDate;
 
     public Commodity() {
     }
 
-    public Commodity(String name, double price, double daily, double weekly, double monthly, double yearly) {
+    public Commodity(String naturalKey, String name, String unit, double price, double percent, Date createdDate, Date expiredDate) {
+        this.naturalKey = naturalKey;
         this.name = name;
+        this.unit = unit;
         this.price = price;
-        this.daily = daily;
-        this.weekly = weekly;
-        this.monthly = monthly;
-        this.yearly = yearly;
+        this.percent = percent;
+        this.createdDate = createdDate;
+        this.expiredDate = expiredDate;
+    }
+
+    public void setValue(String key, String value) {
+        if (key.equalsIgnoreCase("1")) {
+            this.name = value;
+        } else if (key.equalsIgnoreCase("2")) {
+            this.price = Double.parseDouble(value);
+        } else if (key.equalsIgnoreCase("3")) {
+            this.percent = Double.parseDouble(value);
+        } else if (key.equalsIgnoreCase("5")) {
+            this.unit = value;
+        } else if (key.equalsIgnoreCase("4")) {
+            this.category = value;
+        }
     }
 
     @Override
     public String toString() {
-        return "Commodity{" +
-                "name='" + name + '\'' +
-                ", price=" + price +
-                ", daily=" + daily +
-                ", weekly=" + weekly +
-                ", monthly=" + monthly +
-                ", yearly=" + yearly +
-                ", createdDate=" + createdDate +
-                '}';
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        return generateNaturalKey() + "," + name + "," + price + "," + percent + "," + category + "," + unit + "," + dateFormat.format(createdDate);
+    }
+
+    public String generateNaturalKey() {
+        return SlugGenerator.toSlug(category + " " + name);
     }
 
     public String getName() {
@@ -40,6 +55,14 @@ public class Commodity {
         this.name = name;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -48,36 +71,12 @@ public class Commodity {
         this.price = price;
     }
 
-    public double getDaily() {
-        return daily;
+    public double getPercent() {
+        return percent;
     }
 
-    public void setDaily(double daily) {
-        this.daily = daily;
-    }
-
-    public double getWeekly() {
-        return weekly;
-    }
-
-    public void setWeekly(double weekly) {
-        this.weekly = weekly;
-    }
-
-    public double getMonthly() {
-        return monthly;
-    }
-
-    public void setMonthly(double monthly) {
-        this.monthly = monthly;
-    }
-
-    public double getYearly() {
-        return yearly;
-    }
-
-    public void setYearly(double yearly) {
-        this.yearly = yearly;
+    public void setPercent(double percent) {
+        this.percent = percent;
     }
 
     public Date getCreatedDate() {
@@ -86,5 +85,21 @@ public class Commodity {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Date getExpiredDate() {
+        return expiredDate;
+    }
+
+    public void setExpiredDate(Date expiredDate) {
+        this.expiredDate = expiredDate;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

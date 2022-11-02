@@ -8,6 +8,9 @@ public interface ICommodityDao {
 
     void loadToStaging(String path);
 
+    void loadToDataWarehouse();
+
     void transformStaging();
+
     void truncateStaging();
 }

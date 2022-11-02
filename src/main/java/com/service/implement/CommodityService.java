@@ -13,7 +13,17 @@ public class CommodityService implements ICommodityService {
     }
 
     @Override
+    public void loadToDataWarehouse() {
+        commodityDao.loadToDataWarehouse();
+    }
+
+    @Override
     public void truncateStaging() {
         commodityDao.truncateStaging();
+    }
+
+    @Override
+    public void transformStaging() {
+        commodityDao.transformStaging();
     }
 }
