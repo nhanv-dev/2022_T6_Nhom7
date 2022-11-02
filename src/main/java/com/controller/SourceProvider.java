@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.model.Commodity;
 import com.model.Configuration;
 import com.util.PathGenerator;
 import com.util.SlugGenerator;
@@ -28,23 +29,28 @@ public class SourceProvider {
             if (file.exists()) file.delete();
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
             Document doc = Jsoup.connect(configuration.getSource()).get();
-//            Element container= doc.select(configuration.getProperty("selector_container")).first();
-            Elements rows = doc.select(configuration.getProperty("selector_row"));
-            for (Element row : rows) {
-                StringBuilder output = new StringBuilder();
-                String naturalKey = configuration.getProperty("natural_key");
-                boolean hasCreatedDate = configuration.getProperty("created_date") != null;
-                for (Map.Entry<String, String> selector : configuration.getColumns().entrySet()) {
-                    Element element = row.select(selector.getValue()).first();
-                    if (element != null) {
-                        if (selector.getKey().equalsIgnoreCase(naturalKey))
-                            output.append(SlugGenerator.toSlug(element.text())).append(",");
-                        output.append(element.text().replaceAll("%|,", "")).append(",");
+            Elements containers = doc.select(configuration.getProperty("selector_container"));
+            for (Element container : containers) {
+                int size = container.select(configuration.getProperty("selector_row")).size();
+                for (int i = 0; i < size; i++) {
+                    StringBuilder output = new StringBuilder();
+                    Element row = container.select(configuration.getProperty("selector_row")).get(i);
+                    Commodity commodity = new Commodity();
+                    commodity.setCreatedDate(new Date(System.currentTimeMillis()));
+                    for (Map.Entry<String, String> selector : configuration.getColumns().entrySet()) {
+                        Element element = row.select(selector.getValue()).first();
+                        if (element == null) element = container.select(selector.getValue()).first();
+                        if (element == null) {
+                            output.append(",");
+                        } else {
+                            String normalizeText = element.text().replaceAll("%|,", "");
+                            commodity.setValue(selector.getKey().split("_")[2], normalizeText);
+                        }
                     }
+                    writer.println(commodity.toString());
+//                    writer.println(output);
+                    writer.flush();
                 }
-                if (hasCreatedDate) output.append(this.getCreatedDate());
-                writer.println(output);
-                writer.flush();
             }
             return true;
         } catch (Exception e) {
@@ -53,10 +59,6 @@ public class SourceProvider {
         }
     }
 
-    private String getCreatedDate() {
-        Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
-        return dateFormat.format(date);
-    }
+
 
 }
