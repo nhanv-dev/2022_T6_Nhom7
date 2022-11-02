@@ -1,5 +1,7 @@
 package com.dao.implement;
 
+import com.model.Configuration;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,26 +20,18 @@ public class DatabaseConnector {
     static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Properties prop = new Properties();
-            FileInputStream fis = new FileInputStream(".config");
-            prop.load(fis);
-            username = prop.getProperty("database.username");
-            password = prop.getProperty("database.password");
+            username = Configuration.getProperty("database.username");
+            password = Configuration.getProperty("database.password");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
     public static Connection getConnection(String database) {
         try {
-            Connection connection = DriverManager.getConnection(URL + database, username, password);
-            System.out.println("Connection Successfully: " + connection.getCatalog());
-            return connection;
+            return DriverManager.getConnection(URL + database, username, password);
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Connection Failed!!!");
             return null;
         }
     }

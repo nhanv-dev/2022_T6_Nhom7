@@ -1,7 +1,9 @@
 package com.dao;
 
-public interface IFileLogDao {
-    long insert(int configId, String path, String status, int authorId);
+import com.model.FileLog;
 
-    boolean updateFileLog(int id,String name);
+public interface IFileLogDao {
+    long insert(FileLog fileLog);
+
+    boolean updateFileLog(long id, String name);
 }

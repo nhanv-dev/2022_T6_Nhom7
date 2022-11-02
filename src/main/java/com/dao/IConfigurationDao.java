@@ -1,8 +1,8 @@
 package com.dao;
 
-import com.model.Configuration;
+import com.model.SourcePattern;
 
 public interface IConfigurationDao {
-    Configuration findOne(int configId);
+    SourcePattern findOne(long configId) throws Exception;
 
 }

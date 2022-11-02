@@ -2,14 +2,14 @@ package com.service.implement;
 
 import com.dao.IConfigurationDao;
 import com.dao.implement.ConfigurationDao;
-import com.model.Configuration;
+import com.model.SourcePattern;
 import com.service.IConfigurationService;
 
 public class ConfigurationService implements IConfigurationService {
     private final IConfigurationDao configurationDao = new ConfigurationDao();
 
     @Override
-    public Configuration findOne(int configId) {
+    public SourcePattern findOne(long configId) throws Exception {
         return configurationDao.findOne(configId);
     }
 }

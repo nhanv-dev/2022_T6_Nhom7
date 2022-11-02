@@ -30,10 +30,10 @@ public class Commodity {
             this.price = Double.parseDouble(value);
         } else if (key.equalsIgnoreCase("3")) {
             this.percent = Double.parseDouble(value);
-        } else if (key.equalsIgnoreCase("5")) {
-            this.unit = value;
         } else if (key.equalsIgnoreCase("4")) {
             this.category = value;
+        } else if (key.equalsIgnoreCase("5")) {
+            this.unit = value;
         }
     }
 

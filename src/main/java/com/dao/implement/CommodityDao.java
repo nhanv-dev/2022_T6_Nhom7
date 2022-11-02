@@ -14,7 +14,7 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
         joiner.add("load data infile ?");
         joiner.add("into table staging");
         joiner.add("FIELDS TERMINATED BY ','");
-        joiner.add("(natural_key, commodity_name, price, percent, unit, created_date)");
+        joiner.add("(natural_key, commodity_name, price, percent, category, unit, created_date)");
         useProcedure(joiner.toString(), DatabaseConnector.STAGING, null, path);
     }
 
