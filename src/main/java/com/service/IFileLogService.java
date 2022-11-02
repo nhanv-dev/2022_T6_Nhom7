@@ -1,8 +1,10 @@
 package com.service;
 
-public interface IFileLogService {
-    long insert(int configId, String path, String status, int authorId);
+import com.model.FileLog;
 
-    boolean updateFileLog(int id, String status);
+public interface IFileLogService {
+    long insert(FileLog fileLog);
+
+    boolean updateFileLog(long id, String status);
 
 }
