@@ -19,9 +19,11 @@ public class ParameterSetter {
                 statement.setLong(i + 1, (Long) param);
             else if (param instanceof Timestamp)
                 statement.setTimestamp(i + 1, (Timestamp) param);
-            else if (param instanceof Date)
+            else if (param instanceof Date) {
                 statement.setDate(i + 1, new Date(((Date) param).getTime()));
-            else if (param instanceof BigDecimal)
+            } else if (param instanceof java.util.Date) {
+                statement.setDate(i + 1, new Date(((java.util.Date) param).getTime()));
+            } else if (param instanceof BigDecimal)
                 statement.setBigDecimal(i + 1, (BigDecimal) param);
             else
                 statement.setNull(i + 1, Types.NULL);

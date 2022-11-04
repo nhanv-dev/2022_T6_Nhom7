@@ -1,5 +1,6 @@
 package com.model;
 
+
 import java.util.Date;
 
 public class FileLog {
