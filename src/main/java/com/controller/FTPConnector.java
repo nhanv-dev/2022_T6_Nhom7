@@ -8,15 +8,17 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
 public class FTPConnector {
-    private static final String FTP_SERVER_ADDRESS = "192.168.1.123";
+    private static final String FTP_SERVER_ADDRESS = "103.97.126.21";
     private static final int FTP_TIMEOUT = 60000;
     private static final int FTP_SERVER_PORT_NUMBER = 21;
+    private static final String FTP_USERNAME = "ftp-user@group7datawarehouse.tk";
+    private static final String FTP_PASSWORD = "ftp-user";
     private FTPClient ftpClient;
 
     public static void main(String[] args) {
         FTPConnector connector = new FTPConnector();
         connector.connectFTPServer();
-        connector.uploadFile("D:/test.txt", "ad.txt");
+//        connector.uploadFile("D:/test.txt", "ad.txt");
     }
 
 
@@ -27,7 +29,7 @@ public class FTPConnector {
             // connect to ftp server
             ftpClient.setDefaultTimeout(FTP_TIMEOUT);
             ftpClient.connect(FTP_SERVER_ADDRESS, FTP_SERVER_PORT_NUMBER);
-            ftpClient.login("ftp-user", "ftp-user");
+            ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
             System.out.println(ftpClient.getReplyString());
             // run the passive mode command
             ftpClient.enterLocalPassiveMode();
