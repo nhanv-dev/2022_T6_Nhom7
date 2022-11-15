@@ -9,7 +9,6 @@ public class LoggerUtil {
 
     public static Logger getInstance(Object c) {
         logger = LogManager.getLogger(c);
-        Class<Main> mainClass = Main.class;
         return logger;
     }
 }

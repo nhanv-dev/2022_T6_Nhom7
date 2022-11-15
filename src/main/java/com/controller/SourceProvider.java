@@ -48,7 +48,6 @@ public class SourceProvider {
             }
         }
         return true;
-
     }
 
 

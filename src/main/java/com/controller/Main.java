@@ -55,6 +55,7 @@ public class Main {
             commodityService.loadToDataWarehouse();
             LoggerUtil.getInstance(Main.class).info("Load to Data warehouse successfully");
         } catch (Exception e) {
+            e.printStackTrace();
             LoggerUtil.getInstance(Main.class).error(e);
         }
     }
@@ -94,6 +95,8 @@ public class Main {
 
     public static void main(String[] args) {
         String path = "C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\data\\tradingeconomics-20220917045734.csv";
-        new Main().backup(2, 1, path);
+        new Main().run(1, 1);
+        new Main().run(2, 1);
+
     }
 }
