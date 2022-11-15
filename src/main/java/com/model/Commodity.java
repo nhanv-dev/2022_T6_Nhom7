@@ -1,5 +1,7 @@
 package com.model;
 
+import com.controller.Main;
+import com.util.LoggerUtil;
 import com.util.SlugGenerator;
 
 import java.text.SimpleDateFormat;
@@ -24,16 +26,20 @@ public class Commodity {
     }
 
     public void setValue(String key, String value) {
-        if (key.equalsIgnoreCase("1")) {
-            this.name = value;
-        } else if (key.equalsIgnoreCase("2")) {
-            this.price = Double.parseDouble(value);
-        } else if (key.equalsIgnoreCase("3")) {
-            this.percent = Double.parseDouble(value);
-        } else if (key.equalsIgnoreCase("4")) {
-            this.category = value;
-        } else if (key.equalsIgnoreCase("5")) {
-            this.unit = value;
+        try {
+            if (key.equalsIgnoreCase("1")) {
+                this.name = value;
+            } else if (key.equalsIgnoreCase("2")) {
+                this.price = Double.parseDouble(value);
+            } else if (key.equalsIgnoreCase("3")) {
+                this.percent = Double.parseDouble(value);
+            } else if (key.equalsIgnoreCase("4")) {
+                this.category = value;
+            } else if (key.equalsIgnoreCase("5")) {
+                this.unit = value;
+            }
+        } catch (Exception e) {
+            LoggerUtil.getInstance(Commodity.class).error(e);
         }
     }
 

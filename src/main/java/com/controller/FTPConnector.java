@@ -2,10 +2,14 @@ package com.controller;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
+import com.util.LoggerUtil;
+import org.apache.commons.net.ftp.*;
 
 public class FTPConnector {
     private static final String FTP_SERVER_ADDRESS = "103.97.126.21";
@@ -15,14 +19,24 @@ public class FTPConnector {
     private static final String FTP_PASSWORD = "ftp-user";
     private FTPClient ftpClient;
 
+    public static String formatDirectoryPathFromFileName(String input) {
+        String path = input.split("-")[1].replace(".csv", "");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
+        LocalDate date = LocalDate.parse(path, formatter);
+        return "/" + date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
+    }
+
     public static void main(String[] args) {
         FTPConnector connector = new FTPConnector();
         connector.connectFTPServer();
-//        connector.uploadFile("D:/test.txt", "ad.txt");
+        File directory = new File("C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\data\\");
+        for (File file : directory.listFiles()) {
+            String path = FTPConnector.formatDirectoryPathFromFileName(file.getName());
+            connector.uploadFile(file.getPath(), path, file.getName());
+        }
     }
 
-
-    private void connectFTPServer() {
+    private void connectFTPServer()   {
         ftpClient = new FTPClient();
         try {
             System.out.println("Connecting ftp server...");
@@ -46,21 +60,71 @@ public class FTPConnector {
         }
     }
 
-    public void uploadFile(String path, String remote) {
+    public boolean containDirectory(String directory) throws IOException {
+        ftpClient.changeWorkingDirectory(directory);
+        int returnCode = ftpClient.getReplyCode();
+        return returnCode != 550;
+    }
+
+    public void uploadFile(String path, String directory, String remote) {
         try {
             File localFile = new File(path);
-            if (!localFile.exists()) System.out.println("File not exists");
+            if (!localFile.exists()) throw new Exception("File not exists");
             InputStream inputStream = Files.newInputStream(localFile.toPath());
-            System.out.println("Start uploading first file");
-            boolean done = ftpClient.storeFile(remote, inputStream);
-            System.out.println(ftpClient.getReplyString());
+            boolean createdFile = false;
+            boolean createdDir = containDirectory(directory);
+            if (createdDir) {
+                createdFile = ftpClient.storeFile(remote, inputStream);
+                System.out.println(ftpClient.getReplyString());
+            } else {
+                createdDir = ftpClient.makeDirectory(directory);
+                if (!createdDir) throw new Exception("Create directory in ftp server is fail");
+                ftpClient.changeWorkingDirectory(directory);
+                createdFile = ftpClient.storeFile(remote, inputStream);
+                System.out.println(ftpClient.getReplyString());
+            }
             inputStream.close();
-            if (done) System.out.println("The first file is uploaded successfully.");
-            ftpClient.logout();
-            ftpClient.disconnect();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (!createdFile)
+                throw new Exception("Create file " + directory + "/" + remote + " in ftp server is fail");
+        } catch (Exception e) {
+            e.printStackTrace();
+            LoggerUtil.getInstance(FTPConnector.class).error(e);
         }
+
+    }
+
+    private boolean createFile(String path, String remote) {
+        try {
+            return true;
+        } catch (Exception e) {
+
+        }
+        return false;
+    }
+
+    private List<FTPFile> getListFileFromFTPServer(String path, final String ext) {
+        List<FTPFile> listFiles = new ArrayList<>();
+        try {
+            FTPFile[] ftpFiles = ftpClient.listFiles(path, new FTPFileFilter() {
+                public boolean accept(FTPFile file) {
+                    return file.getName().endsWith(ext);
+                }
+            });
+            if (ftpFiles.length > 0) {
+                for (FTPFile ftpFile : ftpFiles) {
+                    // add file to listFiles
+                    if (ftpFile.isFile()) {
+                        listFiles.add(ftpFile);
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return listFiles;
+    }
+
+    public void downloadFile() {
 
     }
 
