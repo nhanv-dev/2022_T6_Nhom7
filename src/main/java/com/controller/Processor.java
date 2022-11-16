@@ -1,6 +1,5 @@
 package com.controller;
 
-import com.model.Commodity;
 import com.model.SourcePattern;
 import com.model.FileLog;
 import com.service.ICommodityService;
@@ -54,7 +53,7 @@ public class Processor {
             LoggerUtil.getInstance(Processor.class).info("Load to Staging successfully");
             status = 2;
             // Transform staging
-            Trasnformer trasnformer = new Trasnformer();
+            Transformer trasnformer = new Transformer();
             commodityService.transformStaging();
             LoggerUtil.getInstance(Processor.class).info("Transform staging >>> Success = " + true);
             status = 3;
@@ -98,7 +97,7 @@ public class Processor {
             fileLogService.updateStatus(fileLog.getId(), FileLog.TRANSFORM_STATUS);
             LoggerUtil.getInstance(Processor.class).info("Load file to staging successfully");
             // Transform staging
-            Trasnformer trasnformer = new Trasnformer();
+            Transformer trasnformer = new Transformer();
             commodityService.transformStaging();
             fileLogService.updateStatus(fileLog.getId(), FileLog.LOAD_STATUS);
             LoggerUtil.getInstance(Processor.class).info("Transform staging successfully");
@@ -126,7 +125,9 @@ public class Processor {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
 
+    public static void main(String[] args) {
+        new Processor().run(1, 1);
+        new Processor().run(2, 1);
     }
 }

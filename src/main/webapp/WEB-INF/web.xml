@@ -8,7 +8,7 @@
     </session-config>
     <servlet-mapping>
         <servlet-name>default</servlet-name>
-        <url-pattern>*.htm</url-pattern>
+        <url-pattern>*.html</url-pattern>
         <url-pattern>*.css</url-pattern>
         <url-pattern>*.js</url-pattern>
         <url-pattern>*.png</url-pattern>

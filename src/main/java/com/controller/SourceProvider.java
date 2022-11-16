@@ -2,6 +2,7 @@ package com.controller;
 
 import com.model.Commodity;
 import com.model.SourcePattern;
+import com.util.LoggerUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,19 +30,23 @@ public class SourceProvider {
         for (Element container : containers) {
             int size = container.select(configuration.getProperty("selector_row")).size();
             for (int i = 0; i < size; i++) {
-                Element row = container.select(configuration.getProperty("selector_row")).get(i);
-                Commodity commodity = new Commodity();
-                commodity.setCreatedDate(new Date(System.currentTimeMillis()));
-                for (Map.Entry<String, String> selector : configuration.getColumns().entrySet()) {
-                    Element element = row.select(selector.getValue()).first();
-                    if (element == null) element = container.select(selector.getValue()).first();
-                    if (element != null) {
-                        String normalizeText = element.text().replaceAll("%|,", "");
-                        commodity.setValue(selector.getKey().split("_")[2], normalizeText);
+                try {
+                    Element row = container.select(configuration.getProperty("selector_row")).get(i);
+                    Commodity commodity = new Commodity();
+                    commodity.setCreatedDate(new Date(System.currentTimeMillis()));
+                    for (Map.Entry<String, String> selector : configuration.getColumns().entrySet()) {
+                        Element element = row.select(selector.getValue()).first();
+                        if (element == null) element = container.select(selector.getValue()).first();
+                        if (element != null) {
+                            String normalizeText = element.text().replaceAll("%|,", "");
+                            commodity.setValue(selector.getKey().split("_")[2], normalizeText);
+                        }
                     }
+                    writer.println(commodity.print());
+                    writer.flush();
+                } catch (Exception e) {
+                    LoggerUtil.getInstance(SourceProvider.class).error(e);
                 }
-                writer.println(commodity.print());
-                writer.flush();
             }
         }
         return true;

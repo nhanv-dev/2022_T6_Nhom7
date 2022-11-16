@@ -29,7 +29,7 @@ public class DatabaseConnector {
 
     public static Connection getConnection(String database) {
         try {
-            return DriverManager.getConnection(URL + database, username, password);
+            return DriverManager.getConnection(URL + database, "root", "admin");
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
