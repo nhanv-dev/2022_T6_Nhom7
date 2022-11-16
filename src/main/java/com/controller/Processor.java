@@ -5,9 +5,11 @@ import com.model.FileLog;
 import com.service.ICommodityService;
 import com.service.IConfigurationService;
 import com.service.IFileLogService;
+import com.service.ISendMailError;
 import com.service.implement.CommodityService;
 import com.service.implement.ConfigurationService;
 import com.service.implement.FileLogService;
+import com.service.implement.SendErrorService;
 import com.util.FormatterUtil;
 import com.util.LoggerUtil;
 
@@ -16,7 +18,11 @@ import java.util.*;
 
 public class Processor {
 
+    private ISendMailError sendMailError = new SendErrorService();
+    private  String mail_giang = "gianglqs07@gmail.com";
+
     public void run(int configId, int authorId) {
+        int status = 0;
         try {
             LoggerUtil.getInstance(Processor.class).info("Run processor");
             IConfigurationService configurationService = new ConfigurationService();
@@ -24,7 +30,10 @@ public class Processor {
             ICommodityService commodityService = new CommodityService();
             // Find configuration by id
             SourcePattern sourcePattern = configurationService.findOne(configId);
-            if (sourcePattern == null) throw new Exception("Configuration not found");
+            if (sourcePattern == null) {
+                throw new Exception("Configuration not found");
+            }
+            status = 1;
             // Generate path location
             String path = sourcePattern.generatePath();
             SourceProvider provider = new SourceProvider();
@@ -42,17 +51,29 @@ public class Processor {
             commodityService.truncateStaging();
             commodityService.loadToStaging(path);
             LoggerUtil.getInstance(Processor.class).info("Load to Staging successfully");
+            status = 2;
             // Transform staging
             Transformer trasnformer = new Transformer();
             commodityService.transformStaging();
             LoggerUtil.getInstance(Processor.class).info("Transform staging >>> Success = " + true);
+            status = 3;
             // Load to Data warehouse
             commodityService.loadToDataWarehouse();
             LoggerUtil.getInstance(Processor.class).info("Load to Data warehouse successfully");
+
         } catch (Exception e) {
             e.printStackTrace();
             LoggerUtil.getInstance(Processor.class).error(e);
         }
+
+
+
+            switch (status){
+                case 0: sendMailError.sendError("Configuration not found",mail_giang);
+                case 1: sendMailError.sendError("Error load data into Staging",mail_giang);
+                case 2: sendMailError.sendError("Error transform data in Staging",mail_giang);
+                case 3: sendMailError.sendError("Error load data into Data warehouse",mail_giang);
+            }
     }
 
     public void backup(int configId, int authorId, String path) {
@@ -103,6 +124,7 @@ public class Processor {
             new Processor().backup(1, 1, entry.getValue().getPath());
         }
     }
+
 
     public static void main(String[] args) {
         new Processor().run(1, 1);
