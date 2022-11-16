@@ -1,6 +1,5 @@
 package com.controller;
 
-import com.model.Commodity;
 import com.model.SourcePattern;
 import com.model.FileLog;
 import com.service.ICommodityService;
@@ -44,7 +43,7 @@ public class Processor {
             commodityService.loadToStaging(path);
             LoggerUtil.getInstance(Processor.class).info("Load to Staging successfully");
             // Transform staging
-            Trasnformer trasnformer = new Trasnformer();
+            Transformer trasnformer = new Transformer();
             commodityService.transformStaging();
             LoggerUtil.getInstance(Processor.class).info("Transform staging >>> Success = " + true);
             // Load to Data warehouse
@@ -55,6 +54,7 @@ public class Processor {
             LoggerUtil.getInstance(Processor.class).error(e);
         }
     }
+
     public void backup(int configId, int authorId, String path) {
         try {
             LoggerUtil.getInstance(Processor.class).info("Run backup");
@@ -76,7 +76,7 @@ public class Processor {
             fileLogService.updateStatus(fileLog.getId(), FileLog.TRANSFORM_STATUS);
             LoggerUtil.getInstance(Processor.class).info("Load file to staging successfully");
             // Transform staging
-            Trasnformer trasnformer = new Trasnformer();
+            Transformer trasnformer = new Transformer();
             commodityService.transformStaging();
             fileLogService.updateStatus(fileLog.getId(), FileLog.LOAD_STATUS);
             LoggerUtil.getInstance(Processor.class).info("Transform staging successfully");
@@ -88,6 +88,7 @@ public class Processor {
             LoggerUtil.getInstance(Processor.class).error(e);
         }
     }
+
     public static void loadAllFile(String dirPath) {
         LoggerUtil.getInstance(Processor.class).info("Run load all file");
         File directory = new File(dirPath);
@@ -102,7 +103,9 @@ public class Processor {
             new Processor().backup(1, 1, entry.getValue().getPath());
         }
     }
-    public static void main(String[] args) throws InterruptedException {
 
+    public static void main(String[] args) {
+        new Processor().run(1, 1);
+        new Processor().run(2, 1);
     }
 }

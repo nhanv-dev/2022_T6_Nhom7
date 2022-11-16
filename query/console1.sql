@@ -74,7 +74,7 @@ VALUES (1, 'Trần Thanh Nhân', '0354536457', '19130159@st.hcmuaf.edu.vn'),
        (3, 'Lê Quốc Sơn Giang', '0394820944', '19130060@st.hcmuaf.edu.vn');
 # Find file configuration
 DELIMITER $
-CREATE PROCEDURE find_file_configuration(IN id int)
+CREATE PROCEDURE controller.find_file_configuration(IN id int)
 BEGIN
     select ck.config_id, config_name, config_value
     from file_configuration
@@ -82,15 +82,14 @@ BEGIN
     where file_configuration.config_id = id;
 END $
 # Insert file_log
-CREATE PROCEDURE insert_file_log(IN c_id long, IN path varchar(255), IN status varchar(10), IN author_id int,
-                                 IN created_at DATE, OUT id int)
+CREATE PROCEDURE controller.insert_file_log(IN c_id long, IN path varchar(255), IN status varchar(10), IN author_id int, IN created_at DATE, OUT id int)
 BEGIN
     INSERT INTO controller.file_log (config_id, file_path, file_status, author, created_date)
     VALUES (c_id, path, status, author_id, created_at);
     SET id = LAST_INSERT_ID();
 END $
 # Update file_log
-CREATE PROCEDURE update_status_file_log(IN id int, IN status varchar(10))
+CREATE PROCEDURE controller.update_status_file_log(IN id int, IN status varchar(10))
 BEGIN
     UPDATE controller.file_log
     SET file_status = status
@@ -98,35 +97,36 @@ BEGIN
 END $
 DELIMITER ;
 
-insert into unit_dim(unit_name, unit_desc, unit_keyword)
-values ('USD/MMBtu', 'USD per MMBtu', 'USD/MMBtu,'),
-       ('USD/Gal', 'USD per Gallon', 'USD/Gal,USD per Gallone,USD per Gallon'),
-       ('USD/MMBtu', 'USD per 100 Liter', ''),
-       ('USD/Bu', 'USD per Bushel', ''),
-       ('USD/1000 board feet', 'USD per 1.000 board feet', 'USD per 1.000 board feet'),
-       ('USD/Lbs', 'USD per lb.', 'USD/Lbs'),
-       ('USD/T', 'USD per Ton', 'USD/T,USD per Ton,USD per Dry Metric Ton'),
-       ('USC/T', 'USC per Ton', ''),
-       ('EUR/T', 'EUR per Ton', ''),
-       ('GBP/T', 'GBP per Ton', 'GBP/T,GBP per Ton'),
-       ('MYR/T', 'Ringgit per Ton', 'MYR/T,Ringgit/T,Ringgit per Ton'),
-       ('CAD/T', 'CAD per Ton', ''),
-       ('EUR/100Kg', 'EUR per 100Kg', 'EUR/100KG,EUR per 100Kg'),
-       ('USD/cwt', 'USD per cwt.', 'USD/cwt,USD per cwt.'),
-       ('USD/Dozen', 'USD per Dozen', 'USD/Dozen'),
-       ('GBP/thm', 'GBP per thm', 'GBP/thm'),
-       ('USD/t.oz', 'USD per Troy Ounce', 'USD/t oz.'),
-       ('USD/Kg', 'USD per Kg', 'USD Cents / Kg,USD/Kgs,USD/Kg'),
-       ('AUD/100Kg', 'USD/Bbl', ''),
-       ('Index Points', 'Index Points', 'Index Points'),
-       ('CNY/Kg', 'Index Points', 'CNY/Kg'),
-       ('EUR/MT', 'Index Points', 'EUR/MT'),
-       ('BRL/Kg', 'Index Points', 'BRL/Kg,BRL/Kgs'),
-       ('NOK/Kg', 'Index Points', 'NOK/Kg'),
-       ('EUR', 'EURO', 'EUR'),
-       ('USD', 'USD', 'USD'),
-       ('GBP/MWh', 'GBP/MWh', 'GBP/MWh'),
-       ('EUR/MWh', 'EUR per MWh', 'EUR/MWh');
+# insert into unit_dim(unit_name, unit_desc, unit_keyword)
+# values ('USD/MMBtu', 'USD per MMBtu', 'USD/MMBtu,'),
+#        ('USD/Gal', 'USD per Gallon', 'USD/Gal,USD per Gallone,USD per Gallon'),
+#        ('USD/MMBtu', 'USD per 100 Liter', ''),
+#        ('USD/Bu', 'USD per Bushel', ''),
+#        ('USD/1000 board feet', 'USD per 1.000 board feet', 'USD per 1.000 board feet'),
+#        ('USD/Lbs', 'USD per lb.', 'USD/Lbs'),
+#        ('USD/T', 'USD per Ton', 'USD/T,USD per Ton,USD per Dry Metric Ton'),
+#        ('USC/T', 'USC per Ton', ''),
+#        ('EUR/T', 'EUR per Ton', ''),
+#        ('GBP/T', 'GBP per Ton', 'GBP/T,GBP per Ton'),
+#        ('MYR/T', 'Ringgit per Ton', 'MYR/T,Ringgit/T,Ringgit per Ton'),
+#        ('CAD/T', 'CAD per Ton', ''),
+#        ('EUR/100Kg', 'EUR per 100Kg', 'EUR/100KG,EUR per 100Kg'),
+#        ('USD/cwt', 'USD per cwt.', 'USD/cwt,USD per cwt.'),
+#        ('USD/Dozen', 'USD per Dozen', 'USD/Dozen'),
+#        ('GBP/thm', 'GBP per thm', 'GBP/thm'),
+#        ('USD/t.oz', 'USD per Troy Ounce', 'USD/t oz.'),
+#        ('USD/Kg', 'USD per Kg', 'USD Cents / Kg,USD/Kgs,USD/Kg'),
+#        ('AUD/100Kg', 'USD/Bbl', ''),
+#        ('Index Points', 'Index Points', 'Index Points'),
+#        ('CNY/Kg', 'Index Points', 'CNY/Kg'),
+#        ('EUR/MT', 'Index Points', 'EUR/MT'),
+#        ('BRL/Kg', 'Index Points', 'BRL/Kg,BRL/Kgs'),
+#        ('NOK/Kg', 'Index Points', 'NOK/Kg'),
+#        ('EUR', 'EURO', 'EUR'),
+#        ('USD', 'USD', 'USD'),
+#        ('GBP/MWh', 'GBP/MWh', 'GBP/MWh'),
+#        ('EUR/MWh', 'EUR per MWh', 'EUR/MWh');
 
-select * from file_log;
-select * from configuration_key
+
+
+

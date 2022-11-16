@@ -39,6 +39,7 @@ public class Commodity {
             }
         } catch (Exception e) {
             LoggerUtil.getInstance(Commodity.class).error(e);
+            throw e;
         }
     }
 
