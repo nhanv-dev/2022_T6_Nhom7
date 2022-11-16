@@ -5,6 +5,7 @@ import com.model.Commodity;
 import java.util.List;
 
 public interface ICommodityDao {
+    List<Commodity> findUnexpiredData();
 
     void loadToStaging(String path);
 

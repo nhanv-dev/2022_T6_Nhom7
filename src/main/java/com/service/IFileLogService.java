@@ -5,6 +5,6 @@ import com.model.FileLog;
 public interface IFileLogService {
     long insert(FileLog fileLog);
 
-    boolean updateFileLog(long id, String status);
+    void updateStatus(long id, String status);
 
 }

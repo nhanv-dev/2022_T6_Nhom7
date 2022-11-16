@@ -1,11 +1,9 @@
 package com.dao.implement;
 
-import com.controller.Main;
 import com.dao.GenericDao;
-import com.dao.implement.DatabaseConnector;
 import com.mapper.IRowMapper;
+import com.util.LoggerUtil;
 import com.util.ParameterSetter;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
@@ -13,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractDao<T> implements GenericDao<T> {
-    private static final Logger logger = LogManager.getLogger(Main.class);
+    private static final Logger logger = LoggerUtil.getInstance(AbstractDao.class);
 
     @Override
     public List<T> query(String sql, String database, IRowMapper<T> rowMapper, Object... parameters) {
@@ -52,6 +50,7 @@ public abstract class AbstractDao<T> implements GenericDao<T> {
             statement.close();
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(e);
         }
         return results;
     }

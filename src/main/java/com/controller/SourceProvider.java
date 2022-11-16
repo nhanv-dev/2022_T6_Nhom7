@@ -12,12 +12,9 @@ import java.util.Date;
 import java.util.Map;
 
 public class SourceProvider {
-
-
     public boolean extract(SourcePattern configuration, String path) throws Exception {
-        if (configuration.getProperty("method") == null) {
-            throw new Exception("Configuration does not found extract method ");
-        }
+        if (configuration.getProperty("method") == null)
+            throw new Exception("Configuration does not found extract method");
         if (configuration.getProperty("method").equalsIgnoreCase("jsoup"))
             return this.extractBySelector(configuration, path);
         return false;
@@ -43,12 +40,10 @@ public class SourceProvider {
                         commodity.setValue(selector.getKey().split("_")[2], normalizeText);
                     }
                 }
-                writer.println(commodity.toString());
+                writer.println(commodity.print());
                 writer.flush();
             }
         }
         return true;
     }
-
-
 }

@@ -3,4 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
          version="5.0">
+    <session-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.htm</url-pattern>
+        <url-pattern>*.css</url-pattern>
+        <url-pattern>*.js</url-pattern>
+        <url-pattern>*.png</url-pattern>
+        <url-pattern>*.jpeg</url-pattern>
+        <url-pattern>*.jpg</url-pattern>
+        <url-pattern>*.ico</url-pattern>
+    </servlet-mapping>
 </web-app>

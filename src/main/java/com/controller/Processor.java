@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.model.Commodity;
 import com.model.SourcePattern;
 import com.model.FileLog;
 import com.service.ICommodityService;
@@ -8,22 +9,17 @@ import com.service.IFileLogService;
 import com.service.implement.CommodityService;
 import com.service.implement.ConfigurationService;
 import com.service.implement.FileLogService;
+import com.util.FormatterUtil;
 import com.util.LoggerUtil;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.File;
+import java.util.*;
 
-public class Main {
-    public static Date createdDate(String path) throws ParseException {
-        String time = path.split("-")[1].replace(".csv", "");
-        Date date = new SimpleDateFormat("yyyyMMddhhmmss").parse(time);
-        return date;
-    }
+public class Processor {
 
     public void run(int configId, int authorId) {
         try {
-            LoggerUtil.getInstance(Main.class).info("Run...");
+            LoggerUtil.getInstance(Processor.class).info("Run processor");
             IConfigurationService configurationService = new ConfigurationService();
             IFileLogService fileLogService = new FileLogService();
             ICommodityService commodityService = new CommodityService();
@@ -36,33 +32,32 @@ public class Main {
             // Extract / Raw data
             boolean extracted = provider.extract(sourcePattern, path);
             // Insert file log
-            FileLog fileLog = new FileLog(configId, authorId, path, Main.createdDate(path));
+            FileLog fileLog = new FileLog(configId, authorId, path, FormatterUtil.createdFormatDate(path));
             if (extracted) fileLog.setStatus(FileLog.EXTRACT_STATUS);
             else fileLog.setStatus(FileLog.ERROR_STATUS);
             long logId = fileLogService.insert(fileLog);
-            LoggerUtil.getInstance(Main.class).info("Insert file log with id = " + logId + ", status = " + fileLog.getStatus());
+            LoggerUtil.getInstance(Processor.class).info("Insert file log with id = " + logId + ", status = " + fileLog.getStatus());
             if (logId == -1) throw new Exception("Insert into table file_log unsuccessfully");
             if (!extracted) return;
             // Load to staging
             commodityService.truncateStaging();
             commodityService.loadToStaging(path);
-            LoggerUtil.getInstance(Main.class).info("Load to Staging successfully");
+            LoggerUtil.getInstance(Processor.class).info("Load to Staging successfully");
             // Transform staging
             Trasnformer trasnformer = new Trasnformer();
             commodityService.transformStaging();
-            LoggerUtil.getInstance(Main.class).info("Transform staging >>> Success = " + true);
+            LoggerUtil.getInstance(Processor.class).info("Transform staging >>> Success = " + true);
             // Load to Data warehouse
             commodityService.loadToDataWarehouse();
-            LoggerUtil.getInstance(Main.class).info("Load to Data warehouse successfully");
+            LoggerUtil.getInstance(Processor.class).info("Load to Data warehouse successfully");
         } catch (Exception e) {
             e.printStackTrace();
-            LoggerUtil.getInstance(Main.class).error(e);
+            LoggerUtil.getInstance(Processor.class).error(e);
         }
     }
-
     public void backup(int configId, int authorId, String path) {
         try {
-            LoggerUtil.getInstance(Main.class).info("Run...");
+            LoggerUtil.getInstance(Processor.class).info("Run backup");
             IConfigurationService configurationService = new ConfigurationService();
             IFileLogService fileLogService = new FileLogService();
             ICommodityService commodityService = new CommodityService();
@@ -70,33 +65,44 @@ public class Main {
             SourcePattern sourcePattern = configurationService.findOne(configId);
             if (sourcePattern == null) throw new Exception("Configuration not found");
             // Insert file log
-            FileLog fileLog = new FileLog(configId, authorId, path, Main.createdDate(path));
-            if (true) fileLog.setStatus(FileLog.EXTRACT_STATUS);
-            else fileLog.setStatus(FileLog.ERROR_STATUS);
+            FileLog fileLog = new FileLog(configId, authorId, path, FormatterUtil.createdFormatDate(path));
+            fileLog.setStatus(FileLog.EXTRACT_STATUS);
             long logId = fileLogService.insert(fileLog);
-            LoggerUtil.getInstance(Main.class).info("Insert file log with id = " + logId + ", status = " + fileLog.getStatus());
+            LoggerUtil.getInstance(Processor.class).info("Insert new file log with id = " + logId + ", status = " + fileLog.getStatus());
             if (logId == -1) throw new Exception("Insert into table file_log unsuccessfully");
-            if (!true) return;
             // Load to staging
             commodityService.truncateStaging();
             commodityService.loadToStaging(path);
-            LoggerUtil.getInstance(Main.class).info("Load to Staging successfully");
+            fileLogService.updateStatus(fileLog.getId(), FileLog.TRANSFORM_STATUS);
+            LoggerUtil.getInstance(Processor.class).info("Load file to staging successfully");
             // Transform staging
             Trasnformer trasnformer = new Trasnformer();
             commodityService.transformStaging();
-            LoggerUtil.getInstance(Main.class).info("Transform staging >>> Success = " + true);
+            fileLogService.updateStatus(fileLog.getId(), FileLog.LOAD_STATUS);
+            LoggerUtil.getInstance(Processor.class).info("Transform staging successfully");
             // Load to Data warehouse
             commodityService.loadToDataWarehouse();
-            LoggerUtil.getInstance(Main.class).info("Load to Data warehouse successfully");
+            fileLogService.updateStatus(fileLog.getId(), FileLog.DONE_STATUS);
+            LoggerUtil.getInstance(Processor.class).info("Load staging to data warehouse successfully");
         } catch (Exception e) {
-            LoggerUtil.getInstance(Main.class).error(e);
+            LoggerUtil.getInstance(Processor.class).error(e);
         }
     }
-
-    public static void main(String[] args) {
-        String path = "C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\data\\tradingeconomics-20220917045734.csv";
-        new Main().run(1, 1);
-        new Main().run(2, 1);
+    public static void loadAllFile(String dirPath) {
+        LoggerUtil.getInstance(Processor.class).info("Run load all file");
+        File directory = new File(dirPath);
+        Map<String, File> map = new TreeMap<>();
+        File[] files = directory.listFiles();
+        assert files != null;
+        for (File file : files) {
+            String date = FormatterUtil.getDateFromFormatName(file.getName());
+            map.put(date + "-" + file.getName(), file);
+        }
+        for (Map.Entry<String, File> entry : map.entrySet()) {
+            new Processor().backup(1, 1, entry.getValue().getPath());
+        }
+    }
+    public static void main(String[] args) throws InterruptedException {
 
     }
 }

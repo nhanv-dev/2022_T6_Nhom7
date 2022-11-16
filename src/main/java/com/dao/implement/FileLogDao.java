@@ -6,7 +6,7 @@ import com.model.FileLog;
 
 import java.util.StringJoiner;
 
-public class FileLogDao extends AbstractDao<Commodity> implements IFileLogDao {
+public class FileLogDao extends AbstractDao<FileLog> implements IFileLogDao {
 
     @Override
     public long insert(FileLog fileLog) {
@@ -15,7 +15,8 @@ public class FileLogDao extends AbstractDao<Commodity> implements IFileLogDao {
     }
 
     @Override
-    public boolean updateFileLog(long id, String name) {
-        return false;
+    public void updateStatus(long id, String status) {
+        String sql = "update file_log set file_status = ? where file_id = ?";
+        useProcedure(sql, DatabaseConnector.CONTROLLER, null, status, id);
     }
 }

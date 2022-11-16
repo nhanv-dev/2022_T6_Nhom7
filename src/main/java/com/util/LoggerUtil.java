@@ -1,6 +1,5 @@
 package com.util;
 
-import com.controller.Main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
