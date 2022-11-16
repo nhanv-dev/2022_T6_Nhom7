@@ -1,12 +1,19 @@
 package com.dao.implement;
 
 import com.dao.ICommodityDao;
+import com.mapper.CommodityMapper;
 import com.model.Commodity;
 
 import java.util.List;
 import java.util.StringJoiner;
 
 public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDao {
+
+    @Override
+    public List<Commodity> findUnexpiredData() {
+        String sql = "call find_unexpired_data()";
+        return query(sql, DatabaseConnector.DATA_WAREHOUSE, new CommodityMapper());
+    }
 
     @Override
     public void loadToStaging(String path) {
@@ -20,7 +27,8 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
 
     @Override
     public void loadToDataWarehouse() {
-
+        String sql = "call insert_data()";
+        useProcedure(sql, DatabaseConnector.DATA_WAREHOUSE, null);
     }
 
     @Override

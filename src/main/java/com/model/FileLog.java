@@ -7,6 +7,7 @@ public class FileLog {
     public static final String EXTRACT_STATUS = "ER";
     public static final String TRANSFORM_STATUS = "TR";
     public static final String LOAD_STATUS = "LOAD";
+    public static final String DONE_STATUS = "DONE";
     public static final String ERROR_STATUS = "ERR";
     private long id, configId, authorId;
     private String path, status;

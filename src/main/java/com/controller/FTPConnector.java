@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import com.util.FormatterUtil;
 import com.util.LoggerUtil;
 import org.apache.commons.net.ftp.*;
 
@@ -19,19 +20,14 @@ public class FTPConnector {
     private static final String FTP_PASSWORD = "ftp-user";
     private FTPClient ftpClient;
 
-    public static String formatDirectoryPathFromFileName(String input) {
-        String path = input.split("-")[1].replace(".csv", "");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
-        LocalDate date = LocalDate.parse(path, formatter);
-        return "/" + date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
-    }
+
 
     public static void main(String[] args) {
         FTPConnector connector = new FTPConnector();
         connector.connectFTPServer();
         File directory = new File("C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\data\\");
         for (File file : directory.listFiles()) {
-            String path = FTPConnector.formatDirectoryPathFromFileName(file.getName());
+            String path = FormatterUtil.formatDirectoryPathFTP(file.getName());
             connector.uploadFile(file.getPath(), path, file.getName());
         }
     }

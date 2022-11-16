@@ -1,6 +1,5 @@
 package com.model;
 
-import com.controller.Main;
 import com.util.LoggerUtil;
 import com.util.SlugGenerator;
 
@@ -46,11 +45,24 @@ public class Commodity {
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        return naturalKey + "," + name + "," + price + "," + percent + "," + category + "," + unit + "," + dateFormat.format(expiredDate) + "," + dateFormat.format(createdDate);
+    }
+
+    public String print() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         return generateNaturalKey() + "," + name + "," + price + "," + percent + "," + category + "," + unit + "," + dateFormat.format(createdDate);
     }
 
     public String generateNaturalKey() {
         return SlugGenerator.toSlug(category + " " + name);
+    }
+
+    public String getNaturalKey() {
+        return naturalKey;
+    }
+
+    public void setNaturalKey(String naturalKey) {
+        this.naturalKey = naturalKey;
     }
 
     public String getName() {

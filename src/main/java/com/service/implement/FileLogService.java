@@ -14,7 +14,8 @@ public class FileLogService implements IFileLogService {
     }
 
     @Override
-    public boolean updateFileLog(long id, String status) {
-        return fileLogDao.updateFileLog(id, status);
+    public void updateStatus(long id, String status) {
+        fileLogDao.updateStatus(id, status);
     }
+
 }
