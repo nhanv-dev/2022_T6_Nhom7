@@ -13,6 +13,10 @@ import java.util.Date;
 import java.util.Map;
 
 public class SourceProvider {
+    public SourceProvider() {
+
+    }
+
     public boolean extract(SourcePattern configuration, String path) throws Exception {
         if (configuration.getProperty("method") == null)
             throw new Exception("Configuration does not found extract method");

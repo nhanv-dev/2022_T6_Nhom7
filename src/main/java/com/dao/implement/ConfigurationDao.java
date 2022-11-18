@@ -14,16 +14,12 @@ public class ConfigurationDao extends AbstractDao<SourcePattern> implements ICon
 
     @Override
     public SourcePattern findOne(long configId) {
-        String sql = "select * from file_configuration where config_id=?";
-        List<SourcePattern> configuration = useProcedure(sql, DatabaseConnector.CONTROLLER, new SourcePatternMapper(), configId);
+        List<SourcePattern> configuration = useProcedure(Configuration.getProperty("database.find_file_configuration"), Configuration.getProperty("database.controller"), new SourcePatternMapper(), configId);
         if (configuration.isEmpty() || configuration.get(0) == null) return null;
         SourcePattern sourcePattern = configuration.get(0);
         List<ConfigurationKey> keys = configurationKeyDao.findByConfigId(sourcePattern.getId());
-        for (ConfigurationKey key : keys) {
-            sourcePattern.put(key.getKey(), key.getValue());
-        }
-        if (sourcePattern.getProperties().entrySet().isEmpty()) return null;
-        return sourcePattern;
+        for (ConfigurationKey key : keys) sourcePattern.put(key.getKey(), key.getValue());
+        return sourcePattern.getProperties().entrySet().isEmpty() ? null : sourcePattern;
     }
 
 

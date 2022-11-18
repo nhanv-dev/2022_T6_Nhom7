@@ -1,6 +1,7 @@
 package com.dao.implement;
 
 import com.model.Configuration;
+import com.util.LoggerUtil;
 
 import java.io.*;
 import java.sql.Connection;
@@ -10,10 +11,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 public class DatabaseConnector {
-    public static String STAGING = "staging";
-    public static String DATA_WAREHOUSE = "data_warehouse";
-    public static String CONTROLLER = "controller";
-    private static String URL = "jdbc:mysql://localhost:3306/";
+    private static String url;
     private static String username;
     private static String password;
 
@@ -22,15 +20,18 @@ public class DatabaseConnector {
             Class.forName("com.mysql.cj.jdbc.Driver");
             username = Configuration.getProperty("database.username");
             password = Configuration.getProperty("database.password");
+            url = Configuration.getProperty("database.driver");
         } catch (ClassNotFoundException e) {
+            LoggerUtil.getInstance(DatabaseConnector.class).error(e);
             e.printStackTrace();
         }
     }
 
     public static Connection getConnection(String database) {
         try {
-            return DriverManager.getConnection(URL + database, "root", "admin");
+            return DriverManager.getConnection(url + database, username, password);
         } catch (SQLException e) {
+            LoggerUtil.getInstance(DatabaseConnector.class).error(e);
             e.printStackTrace();
             return null;
         }

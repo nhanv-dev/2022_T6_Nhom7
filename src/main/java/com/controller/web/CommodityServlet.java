@@ -8,11 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "CommodityServlet", value = "/commodity")
+@WebServlet(name = "CommodityServlet", value = "/commodity/*")
 public class CommodityServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        request.getRequestDispatcher("/home/Home.jsp").forward(request, response);
     }
 
     @Override

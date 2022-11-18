@@ -1,5 +1,5 @@
 package com.service;
 
-public interface ISendMailError {
+public interface ISendMail {
     void sendError(String error, String... receiver);
 }
