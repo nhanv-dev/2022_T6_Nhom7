@@ -4,11 +4,7 @@ package com.model;
 import java.util.Date;
 
 public class FileLog {
-    public static final String EXTRACT_STATUS = "ER";
-    public static final String TRANSFORM_STATUS = "TR";
-    public static final String LOAD_STATUS = "LOAD";
-    public static final String DONE_STATUS = "DONE";
-    public static final String ERROR_STATUS = "ERR";
+
     private long id, configId, authorId;
     private String path, status;
     private Date createdDate;
@@ -18,6 +14,14 @@ public class FileLog {
         this.authorId = authorId;
         this.path = path;
         this.createdDate = createdDate;
+    }
+
+    public FileLog(long configId, long authorId, String path, Date createdDate, String status) {
+        this.configId = configId;
+        this.authorId = authorId;
+        this.path = path;
+        this.createdDate = createdDate;
+        this.status = status;
     }
 
     @Override
