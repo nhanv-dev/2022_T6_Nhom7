@@ -59,9 +59,11 @@ public class Processor {
             LoggerUtil.getInstance(Processor.class).info("Transform staging >>> Success = " + true);
             status = 3;
             // Load to Data warehouse
+
             commodityService.loadToDataWarehouse();
             fileLogService.updateStatus(logId, Configuration.getProperty("database.done_status"));
             LoggerUtil.getInstance(Processor.class).info("Load to Data warehouse successfully");
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,7 +132,7 @@ public class Processor {
 
 
     public static void main(String[] args) {
-        new Processor().run(1, 1);
-        new Processor().run(2, 1);
+        new Processor().run(1, 2);
+      new Processor().run(2, 1);
     }
 }

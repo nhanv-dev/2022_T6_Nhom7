@@ -29,6 +29,7 @@ public class DatabaseConnector {
 
     public static Connection getConnection(String database) {
         try {
+
             return DriverManager.getConnection(url + database, username, password);
         } catch (SQLException e) {
             LoggerUtil.getInstance(DatabaseConnector.class).error(e);
