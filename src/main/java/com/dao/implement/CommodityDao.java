@@ -33,12 +33,30 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
 
     @Override
     public void transformStaging() {
+        deleteNullColumnRows();
+        updateToNewValue();
+        insertIntoStagingTransform();
+    }
 
+    private void deleteNullColumnRows() {
+        String deleteRowsNullColumnSql = "call delete_rows_null_column()";
+        useProcedure(deleteRowsNullColumnSql, DatabaseConnector.STAGING, null);
+    }
+
+    private void updateToNewValue() {
+        String updateNewValue = "call update_to_new_value('Agricultural', 'Agriculture')";
+        useProcedure(updateNewValue, DatabaseConnector.STAGING, null);
+    }
+
+    private void insertIntoStagingTransform() {
+        String insertToStagingTransform = "call insert_into_staging_transformed()";
+        useProcedure(insertToStagingTransform, DatabaseConnector.STAGING, null);
     }
 
     @Override
     public void truncateStaging() {
         useProcedure("truncate staging", DatabaseConnector.STAGING, null);
+        useProcedure("truncate staging_transformed", DatabaseConnector.STAGING, null);
     }
 
 }
