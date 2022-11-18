@@ -1,6 +1,6 @@
 package com.service.implement;
 
-import com.service.ISendMailError;
+import com.service.ISendMail;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
@@ -14,7 +14,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-public class SendErrorService implements ISendMailError {
+public class SendMailService implements ISendMail {
 
     private static final String username = "nhom7datawarehouse@gmail.com";
     private static final String password = "flhnvygpzynuzntj";
@@ -35,7 +35,7 @@ public class SendErrorService implements ISendMailError {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject);
 
-            //  messmage.setText(content);
+            //  message.setText(content);
             message.setContent(content, "text/html; charset=UTF-8");
             Transport.send(message);
 
@@ -60,7 +60,7 @@ public class SendErrorService implements ISendMailError {
     }
 
     public static void main(String[] args) {
-        SendErrorService a = new SendErrorService();
+        SendMailService a = new SendMailService();
         a.sendError("sendError", "gianglqs07@gmail.com");
     }
 }

@@ -96,6 +96,7 @@ BEGIN
     WHERE file_id = id;
 END $
 DELIMITER ;
+select * from file_log;
 
 # insert into unit_dim(unit_name, unit_desc, unit_keyword)
 # values ('USD/MMBtu', 'USD per MMBtu', 'USD/MMBtu,'),

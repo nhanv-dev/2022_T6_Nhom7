@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -18,8 +19,10 @@ public class Configuration {
         try {
             properties = new TreeMap<>();
             Properties prop = new Properties();
-            FileInputStream fis = new FileInputStream(".config");
-            prop.load(fis);
+            InputStream application = Configuration.class.getClassLoader().getResourceAsStream("application.properties");
+            InputStream database = Configuration.class.getClassLoader().getResourceAsStream("database.properties");
+            prop.load(application);
+            prop.load(database);
             for (Map.Entry<Object, Object> entry : prop.entrySet())
                 properties.put((String) entry.getKey(), (String) entry.getValue());
         } catch (IOException e) {

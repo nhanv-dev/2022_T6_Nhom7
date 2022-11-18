@@ -12,6 +12,6 @@ public class ConfigurationKeyDao extends AbstractDao<ConfigurationKey> implement
 
     @Override
     public List<ConfigurationKey> findByConfigId(long configId) {
-        return useProcedure("call find_file_configuration(?)", DatabaseConnector.CONTROLLER, new ConfigurationKeyMapper(), configId);
+        return useProcedure(Configuration.getProperty("database.find_configuration_key"), Configuration.getProperty("database.controller"), new ConfigurationKeyMapper(), configId);
     }
 }
