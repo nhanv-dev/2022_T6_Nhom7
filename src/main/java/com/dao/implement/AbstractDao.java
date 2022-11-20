@@ -44,8 +44,7 @@ public abstract class AbstractDao<T> implements GenericDao<T> {
                 statement.executeUpdate();
             } else {
                 ResultSet resultSet = statement.executeQuery();
-                while (resultSet.next())
-                    results.add(rowMapper.mapRow(resultSet));
+                while (resultSet.next()) results.add(rowMapper.mapRow(resultSet));
             }
             statement.close();
         } catch (Exception e) {
@@ -54,23 +53,5 @@ public abstract class AbstractDao<T> implements GenericDao<T> {
         }
         return results;
     }
-
-    @Override
-    public long insert(String sql, String database, Object... parameters) {
-        long id = -1;
-        try {
-            Connection connection = DatabaseConnector.getConnection(database);
-            assert connection != null;
-            CallableStatement statement = connection.prepareCall(sql);
-            ParameterSetter.setParameters(statement, parameters);
-            statement.registerOutParameter("id", java.sql.Types.INTEGER);
-            statement.executeUpdate();
-            id = statement.getInt("id");
-            statement.close();
-            return id;
-        } catch (Exception e) {
-            logger.error(e);
-        }
-        return id;
-    }
+    
 }

@@ -16,14 +16,30 @@ public class SourcePattern {
         this.createdDate = new Date(System.currentTimeMillis());
     }
 
-    public String generatePath() throws Exception {
-        String name = this.getProperty("name");
-        if (name == null) throw new Exception("Configuration name attribute not found");
-        String directory = this.getProperty("directory");
-        if (directory == null) throw new Exception("Configuration directory attribute not found");
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
-        return directory + "/" + name + "-" + dateFormat.format(createdDate) + ".csv";
+    public String generateName() {
+        try {
+            String name = this.getProperty("name");
+            if (name == null) throw new Exception("Configuration name attribute not found");
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            return name + "-" + dateFormat.format(createdDate) + ".csv";
+        } catch (Exception e) {
+            return null;
+        }
     }
+
+    public String generateLocationPath() {
+        try {
+            String name = this.getProperty("name");
+            if (name == null) throw new Exception("Configuration name attribute not found");
+            String directory = this.getProperty("directory");
+            if (directory == null) throw new Exception("Configuration directory attribute not found");
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            return directory + "/" + name + "-" + dateFormat.format(createdDate) + ".csv";
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     @Override
     public String toString() {

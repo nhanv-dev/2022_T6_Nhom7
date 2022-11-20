@@ -9,6 +9,5 @@ public interface GenericDao<T> {
 
     List<T> useProcedure(String sql, String database, IRowMapper<T> rowMapper, Object... parameters);
 
-    long insert(String sql, String database, Object... parameters);
 
 }

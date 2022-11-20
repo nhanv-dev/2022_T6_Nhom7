@@ -1,9 +1,7 @@
 const container = document.querySelector('.data-body');
-const commodities=[]
 axios.get("http://localhost:8080/data_warehouse_war_exploded/api/unexpired-data")
     .then(response => {
         const {data} = response
-        commodities.push([...data])
         // const array = []
         // data.forEach((value) => {
         //     const {category} = value
@@ -18,10 +16,11 @@ axios.get("http://localhost:8080/data_warehouse_war_exploded/api/unexpired-data"
         // });
         // console.log(array)
         container.innerHTML = data.map((value, index) => {
-            const {category, createdDate, name, naturalKey, percent, price, unit} = value
+            const {category, createdDate, expiredDate, name, naturalKey, percent, price, unit} = value
             return `
                     <div class="data-row">
                         <div class="data-index">${index + 1}</div>
+                        <div class="data-cate">${category}</div>
                         <a class="data-name" href="http://localhost:8080/data_warehouse_war_exploded/commodity/${naturalKey}">
                             ${name}
                             <span class="data-unit">(${unit})</span>
