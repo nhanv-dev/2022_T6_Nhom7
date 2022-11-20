@@ -17,40 +17,24 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
 
     @Override
     public void loadToStaging(String path) {
-        useProcedure(Configuration.getProperty("database.load_to_staging"), Configuration.getProperty("database.staging"), null, path);
+        useProcedure(Configuration.getProperty("database.insert_into_staging"), Configuration.getProperty("database.staging"), null, path);
     }
 
     @Override
     public void loadToDataWarehouse() {
-        useProcedure(Configuration.getProperty("database.load_to_data_warehouse"), Configuration.getProperty("database.data_warehouse"), null);
+        useProcedure(Configuration.getProperty("database.insert_into_data_warehouse"), Configuration.getProperty("database.data_warehouse"), null);
     }
 
     @Override
     public void transformStaging() {
-        deleteNullColumnRows();
-        updateToNewValue();
-        insertIntoStagingTransform();
-    }
-
-    private void deleteNullColumnRows() {
-        String deleteRowsNullColumnSql = "call delete_rows_null_column()";
-        useProcedure(deleteRowsNullColumnSql, DatabaseConnector.STAGING, null);
-    }
-
-    private void updateToNewValue() {
-        String updateNewValue = "call update_to_new_value('Agricultural', 'Agriculture')";
-        useProcedure(updateNewValue, DatabaseConnector.STAGING, null);
-    }
-
-    private void insertIntoStagingTransform() {
-        String insertToStagingTransform = "call insert_into_staging_transformed()";
-        useProcedure(insertToStagingTransform, DatabaseConnector.STAGING, null);
+        useProcedure(Configuration.getProperty("database.delete_rows_null_staging"), Configuration.getProperty("database.staging"), null);
+        useProcedure(Configuration.getProperty("database.insert_into_staging_transformed"), Configuration.getProperty("database.staging"), null);
     }
 
     @Override
     public void truncateStaging() {
-        useProcedure("truncate staging", DatabaseConnector.STAGING, null);
-        useProcedure("truncate staging_transformed", DatabaseConnector.STAGING, null);
+        useProcedure(Configuration.getProperty("database.truncate_staging"), Configuration.getProperty("database.staging"), null);
+        useProcedure(Configuration.getProperty("database.truncate_staging_transformed"), Configuration.getProperty("database.staging"), null);
 
     }
 

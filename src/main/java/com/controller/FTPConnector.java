@@ -2,45 +2,28 @@ package com.controller;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import com.util.FormatterUtil;
+import com.model.Configuration;
+import com.util.DateFormatter;
 import com.util.LoggerUtil;
 import org.apache.commons.net.ftp.*;
+import org.apache.logging.log4j.Logger;
 
 public class FTPConnector {
-    private static final String FTP_SERVER_ADDRESS = "103.97.126.21";
-    private static final int FTP_TIMEOUT = 60000;
-    private static final int FTP_SERVER_PORT_NUMBER = 21;
-    private static final String FTP_USERNAME = "ftp-user@group7datawarehouse.tk";
-    private static final String FTP_PASSWORD = "ftp-user";
-    private FTPClient ftpClient;
+    private static FTPClient ftpClient;
+    private final Logger logger = LoggerUtil.getInstance(FTPConnector.class);
 
-
-
-    public static void main(String[] args) {
-        FTPConnector connector = new FTPConnector();
-        connector.connectFTPServer();
-        File directory = new File("C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\data\\");
-        for (File file : directory.listFiles()) {
-            String path = FormatterUtil.formatDirectoryPathFTP(file.getName());
-            connector.uploadFile(file.getPath(), path, file.getName());
-        }
-    }
-
-    private void connectFTPServer()   {
+    public void connect() {
         ftpClient = new FTPClient();
         try {
-            System.out.println("Connecting ftp server...");
+            String timeout = Configuration.getProperty("ftp.timeout");
+            String port = Configuration.getProperty("ftp.server_port_number");
             // connect to ftp server
-            ftpClient.setDefaultTimeout(FTP_TIMEOUT);
-            ftpClient.connect(FTP_SERVER_ADDRESS, FTP_SERVER_PORT_NUMBER);
-            ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
-            System.out.println(ftpClient.getReplyString());
+            if (timeout != null)
+                ftpClient.setDefaultTimeout(Integer.parseInt(timeout));
+            if (port != null)
+                ftpClient.connect(Configuration.getProperty("ftp.server_address"), Integer.parseInt(port));
+            ftpClient.login(Configuration.getProperty("ftp.username"), Configuration.getProperty("ftp.password"));
             // run the passive mode command
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -48,11 +31,22 @@ public class FTPConnector {
             if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
                 disconnectFTPServer();
                 throw new IOException("FTP server not respond!");
-            } else {
-                System.out.println("Connected " + FTP_SERVER_ADDRESS);
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+        }
+    }
+
+    public boolean containFile(String remotePath) {
+        try {
+            FTPFile remoteFile = ftpClient.mlistFile(remotePath);
+            if (remoteFile != null) logger.info("File " + remoteFile.getName() + " exists in ftp server");
+            else logger.info("File " + remotePath + " does not exists in ftp server");
+            return remoteFile != null;
+        } catch (Exception e) {
+            logger.error(e);
+            return false;
         }
     }
 
@@ -67,64 +61,39 @@ public class FTPConnector {
             File localFile = new File(path);
             if (!localFile.exists()) throw new Exception("File not exists");
             InputStream inputStream = Files.newInputStream(localFile.toPath());
-            boolean createdFile = false;
-            boolean createdDir = containDirectory(directory);
-            if (createdDir) {
-                createdFile = ftpClient.storeFile(remote, inputStream);
-                System.out.println(ftpClient.getReplyString());
-            } else {
-                createdDir = ftpClient.makeDirectory(directory);
-                if (!createdDir) throw new Exception("Create directory in ftp server is fail");
+            boolean hasDirectory = containDirectory(directory);
+            System.out.println(directory);
+            if (!hasDirectory) {
+                boolean createdDir = ftpClient.makeDirectory(directory);
+                if (!createdDir) throw new Exception("Create directory in ftp server is failed");
                 ftpClient.changeWorkingDirectory(directory);
-                createdFile = ftpClient.storeFile(remote, inputStream);
-                System.out.println(ftpClient.getReplyString());
             }
+            boolean createdFile = ftpClient.storeFile(remote, inputStream);
+            System.out.println(ftpClient.getReplyString());
             inputStream.close();
-            if (!createdFile)
-                throw new Exception("Create file " + directory + "/" + remote + " in ftp server is fail");
+            if (!createdFile) throw new Exception("Create file " + directory + "/" + remote + " in ftp server is fail");
         } catch (Exception e) {
             e.printStackTrace();
-            LoggerUtil.getInstance(FTPConnector.class).error(e);
+            logger.error(e);
         }
 
     }
 
-    private boolean createFile(String path, String remote) {
+    public void downloadFile(String remoteFile, String localFile) throws Exception {
         try {
-            return true;
+            File downloadFile = new File(localFile);
+            OutputStream output = new BufferedOutputStream(Files.newOutputStream(downloadFile.toPath()));
+            boolean success = ftpClient.retrieveFile(remoteFile, output);
+            if (success) logger.info("Download file " + localFile + " successfully");
+            else logger.info("Download file " + localFile + " failed");
+            output.close();
         } catch (Exception e) {
-
+            logger.error(e);
+            throw e;
         }
-        return false;
     }
 
-    private List<FTPFile> getListFileFromFTPServer(String path, final String ext) {
-        List<FTPFile> listFiles = new ArrayList<>();
-        try {
-            FTPFile[] ftpFiles = ftpClient.listFiles(path, new FTPFileFilter() {
-                public boolean accept(FTPFile file) {
-                    return file.getName().endsWith(ext);
-                }
-            });
-            if (ftpFiles.length > 0) {
-                for (FTPFile ftpFile : ftpFiles) {
-                    // add file to listFiles
-                    if (ftpFile.isFile()) {
-                        listFiles.add(ftpFile);
-                    }
-                }
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return listFiles;
-    }
-
-    public void downloadFile() {
-
-    }
-
-    private void disconnectFTPServer() {
+    public void disconnectFTPServer() {
         if (ftpClient != null && ftpClient.isConnected()) {
             try {
                 ftpClient.logout();

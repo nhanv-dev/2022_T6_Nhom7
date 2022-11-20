@@ -18,24 +18,18 @@
     <link rel="stylesheet" type="text/css" href='${pageContext.request.contextPath}/home/style.css'>
 </head>
 <body>
-<div class="container py-5 px-4">
-    <div class="row">
-        <div class="col">
-ád
+<div class="container">
+    <div class="data-table">
+        <div class="data-header">
+            <div class="data-index">#</div>
+            <div class="data-cate">Category</div>
+            <div class="data-name">Name</div>
+            <div class="data-price">Price</div>
+            <div class="data-percent">Percent</div>
+            <div class="data-created">Created date</div>
         </div>
-        <div class="col-xl-9 col-lg-9">
-            <div class="data-table">
-                <div class="data-header">
-                    <div class="data-index">#</div>
-                    <div class="data-name">Name</div>
-                    <div class="data-price">Price</div>
-                    <div class="data-percent">Percent</div>
-                    <div class="data-created">Created date</div>
-                </div>
-                <div class="data-body">
+        <div class="data-body">
 
-                </div>
-            </div>
         </div>
     </div>
 </div>
