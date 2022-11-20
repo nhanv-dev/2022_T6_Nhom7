@@ -61,13 +61,20 @@ public class Processor {
         }
     }
 
-    public void backup(int configId, int authorId, String localPath) {
+    public void loadFileBackup(int configId, int authorId, File file) {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
+        FTPConnector ftpConnector = new FTPConnector();
         long id = -1;
         try {
+            ftpConnector.connect();
             // Find configuration by id
             SourcePattern sourcePattern = configurationService.findOne(configId);
+            String name = file.getName();
+            String localPath = file.getPath();
+            String remotePath = DateFormatter.generateRemoteFilePath(name);
+            if (!ftpConnector.containFile(remotePath))
+                ftpConnector.uploadFile(localPath, DateFormatter.generateDateFromFormatName(name, "-"), remotePath);
             FileLog fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.extract_status"));
             id = fileLogService.insert(fileLog);
             // Load to staging
@@ -89,7 +96,7 @@ public class Processor {
         }
     }
 
-    public void loadAllFile(int authorId, String dirPath) {
+    public void loadAllFileBackup(int authorId, String dirPath) {
         logger.info("Run load all file");
         File directory = new File(dirPath);
         Map<String, File> map = new TreeMap<>();
@@ -101,13 +108,13 @@ public class Processor {
         for (Map.Entry<String, File> entry : map.entrySet()) {
             int configId = 1;
             if (entry.getValue().getName().startsWith("business")) configId = 2;
-            new Processor().backup(configId, authorId, entry.getValue().getPath());
+            System.out.println(entry.getValue().getPath());
+            new Processor().loadFileBackup(configId, authorId, entry.getValue());
         }
     }
 
-
     public static void main(String[] args) {
-        new Processor().loadAllFile(1, "C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\data\\");
+        new Processor().loadAllFileBackup(1,"C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\data");
 //        new Processor().run(1, 1);
 //        new Processor().run(2, 1);
     }

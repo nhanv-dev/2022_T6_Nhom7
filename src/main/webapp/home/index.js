@@ -3,6 +3,7 @@ const commodities=[]
 axios.get("http://localhost:8080/data_warehouse_war_exploded/api/unexpired-data")
     .then(response => {
         const {data} = response
+        console.log(data)
         commodities.push([...data])
         // const array = []
         // data.forEach((value) => {

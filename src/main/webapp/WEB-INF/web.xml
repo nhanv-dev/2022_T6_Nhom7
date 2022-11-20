@@ -16,4 +16,6 @@
         <url-pattern>*.jpg</url-pattern>
         <url-pattern>*.ico</url-pattern>
     </servlet-mapping>
+
+
 </web-app>

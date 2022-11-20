@@ -62,16 +62,15 @@ public class FTPConnector {
             if (!localFile.exists()) throw new Exception("File not exists");
             InputStream inputStream = Files.newInputStream(localFile.toPath());
             boolean hasDirectory = containDirectory(directory);
-            System.out.println(directory);
             if (!hasDirectory) {
                 boolean createdDir = ftpClient.makeDirectory(directory);
                 if (!createdDir) throw new Exception("Create directory in ftp server is failed");
                 ftpClient.changeWorkingDirectory(directory);
             }
             boolean createdFile = ftpClient.storeFile(remote, inputStream);
-            System.out.println(ftpClient.getReplyString());
             inputStream.close();
             if (!createdFile) throw new Exception("Create file " + directory + "/" + remote + " in ftp server is fail");
+            else logger.info("Upload file into ftp server successfully");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);

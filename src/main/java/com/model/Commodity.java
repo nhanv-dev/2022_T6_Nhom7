@@ -26,15 +26,15 @@ public class Commodity {
 
     public void setValue(String key, String value) {
         try {
-            if (key.equalsIgnoreCase("1")) {
+            if (key.equalsIgnoreCase("name")) {
                 this.name = value;
-            } else if (key.equalsIgnoreCase("2")) {
+            } else if (key.equalsIgnoreCase("price")) {
                 this.price = Double.parseDouble(value);
-            } else if (key.equalsIgnoreCase("3")) {
+            } else if (key.equalsIgnoreCase("percent")) {
                 this.percent = Double.parseDouble(value);
-            } else if (key.equalsIgnoreCase("4")) {
+            } else if (key.equalsIgnoreCase("category")) {
                 this.category = value;
-            } else if (key.equalsIgnoreCase("5")) {
+            } else if (key.equalsIgnoreCase("unit")) {
                 this.unit = value;
             }
         } catch (Exception e) {
