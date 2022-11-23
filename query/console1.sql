@@ -131,3 +131,10 @@ select * from file_log;
 
 
 
+CREATE PROCEDURE controller.findFileLogByDayAndID(IN day int, IN id int)
+BEGIN
+    SELECT * FROM controller.file_log
+    WHERE DAY(file_log.created_date) = day AND file_log.config_id = id;
+END;
+
+call findFileLogByDayAndID(18,1)

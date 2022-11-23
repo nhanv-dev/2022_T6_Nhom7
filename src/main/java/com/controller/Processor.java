@@ -3,10 +3,14 @@ package com.controller;
 import com.model.Configuration;
 import com.model.SourcePattern;
 import com.model.FileLog;
+import com.service.IAuthorService;
 import com.service.IConfigurationService;
 import com.service.IFileLogService;
+import com.service.ISendMailError;
+import com.service.implement.AuthorService;
 import com.service.implement.ConfigurationService;
 import com.service.implement.FileLogService;
+import com.service.implement.SendErrorService;
 import com.util.DateFormatter;
 import com.util.LoggerUtil;
 import org.apache.logging.log4j.Logger;
@@ -18,11 +22,14 @@ import java.util.TreeMap;
 
 public class Processor {
     private final Logger logger = LoggerUtil.getInstance(Processor.class);
-
+    private ISendMailError sendMailError = new SendErrorService();
+    private IAuthorService authorService = new AuthorService();
     public void run(int configId, int authorId) {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
         FTPConnector ftpConnector = new FTPConnector();
+        int status = 0;
+        String path = "";
         long id = -1;
         try {
             // Find configuration by id
@@ -42,6 +49,7 @@ public class Processor {
             } else {
                 ftpConnector.downloadFile(remotePath, localPath);
             }
+            status = 1;
             fileLogService.updateStatus(id, Configuration.getProperty("database.extract_status"));
 
             // Load to staging
@@ -49,19 +57,34 @@ public class Processor {
                 throw new Exception("Source " + sourcePattern.getSource() + " load to staging failed");
             fileLogService.updateStatus(id, Configuration.getProperty("database.transform_status"));
 
+            status = 2;
             // Transform staging
             if (!Transformer.transform())
                 throw new Exception("Source " + sourcePattern.getSource() + " transform failed");
             fileLogService.updateStatus(id, Configuration.getProperty("database.load_status"));
 
+            status = 3;
             // Load to Data warehouse
             if (!Loader.loadToDataWarehouse())
                 throw new Exception("Source " + sourcePattern.getSource() + " load to data warehouse failed");
             fileLogService.updateStatus(id, Configuration.getProperty("database.done_status"));
+            status = 4;
         } catch (Exception e) {
             if (id != -1) fileLogService.updateStatus(id, Configuration.getProperty("database.transform_status"));
             e.printStackTrace();
             logger.error(e);
+        }
+
+
+        switch (status) {
+            case 0:
+                sendMailError.sendError("extract failed", path, (String[]) authorService.listEmailAuthor().toArray());
+            case 1:
+                sendMailError.sendError("Error load data into Staging", path, (String[]) authorService.listEmailAuthor().toArray());
+            case 2:
+                sendMailError.sendError("Error transform data in Staging", path, (String[]) authorService.listEmailAuthor().toArray());
+            case 3:
+                sendMailError.sendError("Error load data into Data warehouse", path, (String[]) authorService.listEmailAuthor().toArray());
         }
     }
 
