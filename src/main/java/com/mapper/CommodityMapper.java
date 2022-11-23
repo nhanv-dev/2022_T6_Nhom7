@@ -17,8 +17,8 @@ public class CommodityMapper implements IRowMapper<Commodity> {
             Commodity commodity = new Commodity();
             commodity.setNaturalKey(rs.getString("natural_key"));
             commodity.setName(rs.getString("commodity_name"));
-            commodity.setPrice(rs.getBigDecimal("price").longValue());
-            commodity.setPercent(rs.getBigDecimal("percent").longValue());
+            commodity.setPrice(rs.getBigDecimal("price").floatValue());
+            commodity.setPercent(rs.getBigDecimal("percent").floatValue());
             commodity.setCategory(rs.getString("cate_name"));
             commodity.setUnit(rs.getString("unit_key"));
             commodity.setExpiredDate(rs.getDate("expired_date"));
