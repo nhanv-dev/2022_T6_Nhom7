@@ -8,13 +8,13 @@ import java.util.Date;
 
 public class Commodity {
     private String naturalKey, name, unit, category;
-    private double price, percent;
+    private float price, percent;
     private Date createdDate, expiredDate;
 
     public Commodity() {
     }
 
-    public Commodity(String naturalKey, String name, String unit, double price, double percent, Date createdDate, Date expiredDate) {
+    public Commodity(String naturalKey, String name, String unit, float price, float percent, Date createdDate, Date expiredDate) {
         this.naturalKey = naturalKey;
         this.name = name;
         this.unit = unit;
@@ -29,9 +29,9 @@ public class Commodity {
             if (key.equalsIgnoreCase("name")) {
                 this.name = value;
             } else if (key.equalsIgnoreCase("price")) {
-                this.price = Double.parseDouble(value);
+                this.price = Float.parseFloat(value);
             } else if (key.equalsIgnoreCase("percent")) {
-                this.percent = Double.parseDouble(value);
+                this.percent = Float.parseFloat(value);
             } else if (key.equalsIgnoreCase("category")) {
                 this.category = value;
             } else if (key.equalsIgnoreCase("unit")) {
@@ -82,19 +82,19 @@ public class Commodity {
         this.unit = unit;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 
-    public double getPercent() {
+    public float getPercent() {
         return percent;
     }
 
-    public void setPercent(double percent) {
+    public void setPercent(float percent) {
         this.percent = percent;
     }
 
