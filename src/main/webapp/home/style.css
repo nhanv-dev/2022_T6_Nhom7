@@ -110,16 +110,6 @@ body::-webkit-scrollbar-thumb:hover {
     color: rgba(0, 0, 0, .5) !important;
 }
 
-.data-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 16px;
-    border-top: 2px solid #e7e8ea;
-    background: #FFFFFF;
-}
-
 .data-row {
     display: flex;
     align-items: center;
@@ -174,7 +164,7 @@ body::-webkit-scrollbar-thumb:hover {
 
 .data-name:hover {
     cursor: pointer;
-    color: #f555;
+    color: green;
 }
 
 .data-unit {

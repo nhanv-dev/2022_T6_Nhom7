@@ -9,7 +9,7 @@ public class ConfigurationService implements IConfigurationService {
     private final IConfigurationDao configurationDao = new ConfigurationDao();
 
     @Override
-    public SourcePattern findOne(long configId) throws Exception {
+    public SourcePattern findOne(long configId)  {
         return configurationDao.findOne(configId);
     }
 }

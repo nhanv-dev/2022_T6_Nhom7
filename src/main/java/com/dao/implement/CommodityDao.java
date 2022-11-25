@@ -35,7 +35,6 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
     public void truncateStaging() {
         useProcedure(Configuration.getProperty("database.truncate_staging"), Configuration.getProperty("database.staging"), null);
         useProcedure(Configuration.getProperty("database.truncate_staging_transformed"), Configuration.getProperty("database.staging"), null);
-
     }
 
 }

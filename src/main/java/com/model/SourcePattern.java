@@ -27,7 +27,7 @@ public class SourcePattern {
         }
     }
 
-    public String generateLocationPath() {
+    public String generateLocalPath() {
         try {
             String name = this.getProperty("name");
             if (name == null) throw new Exception("Configuration name attribute not found");

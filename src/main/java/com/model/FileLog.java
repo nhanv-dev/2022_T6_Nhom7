@@ -9,6 +9,9 @@ public class FileLog {
     private String path, status;
     private Date createdDate;
 
+    public FileLog() {
+    }
+
     public FileLog(long configId, long authorId, String path, Date createdDate) {
         this.configId = configId;
         this.authorId = authorId;

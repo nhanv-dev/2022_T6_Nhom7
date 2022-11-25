@@ -1,11 +1,20 @@
 package com.model;
 
-public class AuthorModel {
-    private String name;
-    private String phone;
-    private String email;
+public class Author {
+    private long id;
+    private String name, phone, email;
 
-    public AuthorModel(){}
+
+    public Author() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

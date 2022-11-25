@@ -1,22 +1,22 @@
 package com.service.implement;
 
-import com.dao.IAuthorDAO;
-import com.dao.implement.AuthorDAO;
-import com.model.AuthorModel;
+import com.dao.IAuthorDao;
+import com.dao.implement.AuthorDao;
+import com.model.Author;
 import com.service.IAuthorService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorService implements IAuthorService {
+    private final IAuthorDao authorDao = new AuthorDao();
+
     public List<String> listEmailAuthor() {
-        IAuthorDAO authorDAO = new AuthorDAO() ;
-        List<AuthorModel> listAuthor = authorDAO.listAuthor();
-        List<String> l = new ArrayList<>();
-        for (AuthorModel a: listAuthor
-        ) {
-            l.add(a.getEmail());
+        List<Author> authors = authorDao.findAllEmail();
+        List<String> emails = new ArrayList<>();
+        for (Author author : authors) {
+            if (author != null) emails.add(author.getEmail());
         }
-        return l;
+        return emails;
     }
 }
