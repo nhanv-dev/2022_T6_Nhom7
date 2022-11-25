@@ -21,7 +21,6 @@ public class UnexpiredDataAPI extends HttpServlet {
         ICommodityService commodityService = new CommodityService();
         List<Commodity> unexpiredData = commodityService.findUnexpiredData();
         String json = GSON.toJson(unexpiredData);
-        System.out.println(json);
         response.setHeader("Content-Type", "application/json");
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");

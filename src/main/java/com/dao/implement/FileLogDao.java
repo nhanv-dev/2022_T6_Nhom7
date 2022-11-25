@@ -1,6 +1,7 @@
 package com.dao.implement;
 
 import com.dao.IFileLogDao;
+import com.mapper.FileLogMapper;
 import com.model.Commodity;
 import com.model.Configuration;
 import com.model.FileLog;
@@ -10,12 +11,19 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.util.Date;
+import java.util.List;
 import java.util.StringJoiner;
 
 public class FileLogDao extends AbstractDao<FileLog> implements IFileLogDao {
     private static final Logger logger = LoggerUtil.getInstance(FileLogDao.class);
 
-   
+    @Override
+    public FileLog findOne(long id, Date date) {
+        List<FileLog> list = useProcedure(Configuration.getProperty("database.find_log_by_day_and_id"), Configuration.getProperty("database.controller"), new FileLogMapper(), date, id);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     public long insert(FileLog fileLog) {
         try {
             Connection connection = DatabaseConnector.getConnection(Configuration.getProperty("database.controller"));
