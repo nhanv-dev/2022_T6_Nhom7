@@ -9,6 +9,7 @@ import com.util.DateFormatter;
 import com.util.LoggerUtil;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.*;
 
 
@@ -20,41 +21,45 @@ public class Processor {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
         SourcePattern sourcePattern = null;
-        long logId = -1;
-        try {
-            // Find configuration by logId
-            sourcePattern = configurationService.findOne(configId);
-            String localPath = sourcePattern.generateLocalPath();
-            if (!exist(configId, DateFormatter.formatCreatedDate(localPath))) {
-                FileLog fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.error_status"));
-                logId = fileLogService.insert(fileLog);
-                extract(configId, logId);
-                loadToStaging(configId, logId);
-                transform(configId, logId);
-                loadToDataWarehouse(configId, logId);
-            } else {
-                logger.info("File log exist in database " + sourcePattern.getSource() + " - " + sourcePattern.getCreatedDate());
-            }
-        } catch (Exception exception) {
-            handleError(logId, sourcePattern, exception, "Process run failed");
+        FileLog fileLog = null;
+        // Find configuration by logId
+        sourcePattern = configurationService.findOne(configId);
+        String localPath = sourcePattern.generateLocalPath();
+        Date date = DateFormatter.formatCreatedDate(localPath);
+        fileLog = fileLogService.findOne(configId, date);
+        if (fileLog == null) {
+            fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.error_status"));
+            fileLog.setId(fileLogService.insert(fileLog));
+        }
+        if (!fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.done_status"))) {
+            extract(configId, authorId, date);
+            loadToStaging(configId, localPath, date);
+            transform(configId, date);
+            loadToDataWarehouse(configId, date);
+        } else {
+            logger.info("Data already exists in data warehouse");
         }
     }
 
-    public boolean exist(long configId, Date date) {
-        IFileLogService fileLogService = new FileLogService();
-        return fileLogService.findOne(configId, date) != null;
-    }
-
-    public void extract(int configId, long logId) {
+    public void extract(long configId, long authorId, Date date) {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
         FTPConnector ftpConnector = new FTPConnector();
         SourcePattern sourcePattern = null;
+        FileLog fileLog = null;
         try {
+            fileLog = fileLogService.findOne(configId, date);
+//            System.out.println(fileLog.getId() + "\t" + fileLog.getStatus());
+            if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.extract_status")))
+                return;
             sourcePattern = configurationService.findOne(configId);
             String name = sourcePattern.generateName();
             String localPath = sourcePattern.generateLocalPath();
             String remotePath = DateFormatter.generateRemoteFilePath(name);
+            if (fileLog == null) {
+                fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.error_status"));
+                fileLog.setId(fileLogService.insert(fileLog));
+            }
             ftpConnector.connect();
             // Extract data. If the server already has an extract file today, it will download the file.
             if (!ftpConnector.containFile(remotePath)) {
@@ -64,65 +69,83 @@ public class Processor {
             } else {
                 ftpConnector.downloadFile(remotePath, localPath);
             }
-            fileLogService.updateStatus(logId, Configuration.getProperty("database.extract_status"));
+            fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.extract_status"));
             logger.info("Extract source " + sourcePattern.getSource() + " successfully");
         } catch (Exception exception) {
-            handleError(logId, sourcePattern, exception, "Extract source  failed");
+            if (fileLog != null)
+                fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+            handleError(sourcePattern, exception, "Extract source failed");
         }
     }
 
-    public void loadToStaging(int configId, long logId) {
+    public void loadToStaging(int configId, String localPath, Date date) {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
         ICommodityService commodityService = new CommodityService();
         SourcePattern sourcePattern = null;
+        FileLog fileLog = null;
         try {
-            sourcePattern = configurationService.findOne(configId);
-            String localPath = sourcePattern.generateLocalPath();
-            commodityService.truncateStaging();
-            commodityService.loadToStaging(localPath);
-            fileLogService.updateStatus(logId, Configuration.getProperty("database.transform_status"));
-            logger.info("Load to staging source " + sourcePattern.getSource() + " successfully");
+            fileLog = fileLogService.findOne(configId, date);
+            if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.extract_status"))) {
+                sourcePattern = configurationService.findOne(configId);
+                commodityService.truncateStaging();
+                commodityService.loadToStaging(localPath);
+                fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.transform_status"));
+                logger.info("Load to staging source " + sourcePattern.getSource() + " successfully");
+            }
         } catch (Exception exception) {
-            handleError(logId, sourcePattern, exception, "Load to staging failed");
+            if (fileLog != null)
+                fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+            handleError(sourcePattern, exception, "Load to staging failed");
         }
     }
 
-    public void transform(int configId, long logId) {
+    public void transform(int configId, Date date) {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
         ICommodityService commodityService = new CommodityService();
         SourcePattern sourcePattern = null;
+        FileLog fileLog = null;
         try {
-            sourcePattern = configurationService.findOne(configId);
-            commodityService.transformStaging();
-            fileLogService.updateStatus(logId, Configuration.getProperty("database.load_status"));
-            logger.info("Transform source " + sourcePattern.getSource() + " successfully");
+            fileLog = fileLogService.findOne(configId, date);
+            if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.transform_status"))) {
+                sourcePattern = configurationService.findOne(configId);
+                commodityService.transformStaging();
+                fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.load_status"));
+                logger.info("Transform source " + sourcePattern.getSource() + " successfully");
+            }
         } catch (Exception exception) {
-            handleError(logId, sourcePattern, exception, "Transform source failed");
+            if (fileLog != null)
+                fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+            handleError(sourcePattern, exception, "Transform source failed");
         }
     }
 
-    public void loadToDataWarehouse(int configId, long logId) {
+    public void loadToDataWarehouse(int configId, Date date) {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
         ICommodityService commodityService = new CommodityService();
         SourcePattern sourcePattern = null;
+        FileLog fileLog = null;
         try {
-            sourcePattern = configurationService.findOne(configId);
-            commodityService.loadToDataWarehouse();
-            fileLogService.updateStatus(logId, Configuration.getProperty("database.done_status"));
-            logger.info("Load to data warehouse source " + sourcePattern.getSource() + " successfully");
+            fileLog = fileLogService.findOne(configId, date);
+            if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.load_status"))) {
+                fileLog = fileLogService.findOne(configId, date);
+                sourcePattern = configurationService.findOne(configId);
+                commodityService.loadToDataWarehouse();
+                fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.done_status"));
+                logger.info("Load into data warehouse source " + sourcePattern.getSource() + " successfully");
+            }
         } catch (Exception exception) {
-            handleError(logId, sourcePattern, exception, "Load to data warehouse failed");
+            if (fileLog != null)
+                fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+            handleError(sourcePattern, exception, "Load into data warehouse failed");
         }
     }
 
-    private void handleError(long logId, SourcePattern sourcePattern, Exception exception, String message) {
+    private void handleError(SourcePattern sourcePattern, Exception exception, String message) {
         IAuthorService authorService = new AuthorService();
-        IFileLogService fileLogService = new FileLogService();
         List<String> emails = authorService.listEmailAuthor();
-        fileLogService.updateStatus(logId, Configuration.getProperty("database.error_status"));
         if (exception != null) logger.error(exception);
         if (sourcePattern != null) logger.error(message);
         sendMailError.sendError(message, "", emails.toArray(new String[0]));

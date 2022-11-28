@@ -12,7 +12,8 @@ import java.io.IOException;
 public class CommodityServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/commodity/Commodity.jsp").forward(request, response);
+
+        request.getRequestDispatcher("/detail/Commodity.jsp").forward(request, response);
     }
 
     @Override
