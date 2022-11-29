@@ -15,6 +15,7 @@ import java.util.*;
 public class Processor {
     private final Logger logger = LoggerUtil.getInstance(Processor.class);
     private final ISendMailError sendMailError = new SendErrorService();
+    private String localPath = "";
 
     public void run(int configId, int authorId) {
         IConfigurationService configurationService = new ConfigurationService();
@@ -68,7 +69,7 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, exception, "Extract source failed");
+            handleError(sourcePattern, localPath, exception, "Extract source failed");
         }
     }
 
@@ -91,7 +92,7 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, exception, "Load to staging failed");
+            handleError(sourcePattern, localPath, exception, "Load to staging failed");
         }
     }
 
@@ -112,7 +113,7 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, exception, "Transform source failed");
+            handleError(sourcePattern, localPath, exception, "Transform source failed");
         }
     }
 
@@ -134,16 +135,17 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, exception, "Load into data warehouse failed");
+            handleError(sourcePattern, localPath, exception, "Load into data warehouse failed");
         }
     }
 
-    private void handleError(SourcePattern sourcePattern, Exception exception, String message) {
+    private void handleError(SourcePattern sourcePattern, String filePath, Exception exception, String message) {
         IAuthorService authorService = new AuthorService();
         List<String> emails = authorService.listEmailAuthor();
         if (exception != null) logger.error(exception);
         if (sourcePattern != null) logger.error(message);
-        sendMailError.sendError(message, "", emails.toArray(new String[0]));
+        sendMailError.sendError(message, filePath, emails.toArray(new String[0]));
+
     }
 
 
