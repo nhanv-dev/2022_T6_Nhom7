@@ -24,7 +24,7 @@ body::-webkit-scrollbar-thumb:hover {
 .header {
     background-color: #FFFFFF;
     border-radius: 5px;
-    padding: 8px 12px;
+    padding: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -51,8 +51,13 @@ body::-webkit-scrollbar-thumb:hover {
     border-radius: 5px;
     gap: 10px;
 }
+
 .button-back i {
     font-size: 10px;
 }
 
-.chart-container {}
+.chart-container {
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    padding: 10px;
+}

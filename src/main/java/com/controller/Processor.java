@@ -9,7 +9,6 @@ import com.util.DateFormatter;
 import com.util.LoggerUtil;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.util.*;
 
 
@@ -27,10 +26,6 @@ public class Processor {
         String localPath = sourcePattern.generateLocalPath();
         Date date = DateFormatter.formatCreatedDate(localPath);
         fileLog = fileLogService.findOne(configId, date);
-        if (fileLog == null) {
-            fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.error_status"));
-            fileLog.setId(fileLogService.insert(fileLog));
-        }
         if (!fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.done_status"))) {
             extract(configId, authorId, date);
             loadToStaging(configId, date);
