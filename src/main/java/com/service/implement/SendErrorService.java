@@ -71,7 +71,7 @@ public class SendErrorService implements ISendMailError {
             message.setContent(multipart);
             Transport.send(message);
 
-        } catch (MessagingException | UnsupportedEncodingException e) {
+        } catch (Exception  e) {
             e.printStackTrace();
         }
     }
@@ -92,6 +92,6 @@ public class SendErrorService implements ISendMailError {
 
     public static void main(String[] args) {
         SendErrorService a = new SendErrorService();
-        a.sendError("sendError", "gianglqs07@gmail.com");
+        a.sendError("sendError","C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/data/tradingeconomics-20221129.csv", "gianglqs07@gmail.com");
     }
 }

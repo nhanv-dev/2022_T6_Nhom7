@@ -24,7 +24,7 @@ public class Processor {
         FileLog fileLog = null;
         // Find configuration by logId
         sourcePattern = configurationService.findOne(configId);
-        String localPath = sourcePattern.generateLocalPath();
+         localPath = sourcePattern.generateLocalPath();System.out.println(localPath);
         Date date = DateFormatter.formatCreatedDate(localPath);
         fileLog = fileLogService.findOne(configId, date);
         if (!fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.done_status"))) {
@@ -43,13 +43,14 @@ public class Processor {
         FTPConnector ftpConnector = new FTPConnector();
         SourcePattern sourcePattern = null;
         FileLog fileLog = null;
+
         try {
             fileLog = fileLogService.findOne(configId, date);
             if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.extract_status")))
                 return;
             sourcePattern = configurationService.findOne(configId);
             String name = sourcePattern.generateName();
-            String localPath = sourcePattern.generateLocalPath();
+             localPath = sourcePattern.generateLocalPath();
             String remotePath = DateFormatter.generateRemoteFilePath(name);
             if (fileLog == null) {
                 fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.error_status"));
@@ -66,10 +67,12 @@ public class Processor {
             }
             fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.extract_status"));
             logger.info("Extract source " + sourcePattern.getSource() + " successfully");
+
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, localPath, exception, "Extract source failed");
+
+            handleError(sourcePattern,localPath, exception,  "Extract source failed");
         }
     }
 
@@ -92,7 +95,8 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, localPath, exception, "Load to staging failed");
+
+            handleError(sourcePattern,localPath, exception, "Load to staging failed");
         }
     }
 
@@ -113,7 +117,8 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, localPath, exception, "Transform source failed");
+
+            handleError(sourcePattern,localPath, exception, "Transform source failed");
         }
     }
 
@@ -135,11 +140,12 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
-            handleError(sourcePattern, localPath, exception, "Load into data warehouse failed");
+
+            handleError(sourcePattern, localPath,exception, "Load into data warehouse failed");
         }
     }
 
-    private void handleError(SourcePattern sourcePattern, String filePath, Exception exception, String message) {
+    private void handleError(SourcePattern sourcePattern,String filePath, Exception exception, String message) {
         IAuthorService authorService = new AuthorService();
         List<String> emails = authorService.listEmailAuthor();
         if (exception != null) logger.error(exception);
