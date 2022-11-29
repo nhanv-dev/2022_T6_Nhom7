@@ -16,6 +16,11 @@ public class CommodityService implements ICommodityService {
     }
 
     @Override
+    public List<Commodity> findByNaturalKey(String naturalKey) {
+        return commodityDao.findByNaturalKey(naturalKey);
+    }
+
+    @Override
     public void loadToStaging(String path) {
         commodityDao.loadToStaging(path);
     }

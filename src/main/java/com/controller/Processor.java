@@ -33,7 +33,7 @@ public class Processor {
         }
         if (!fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.done_status"))) {
             extract(configId, authorId, date);
-            loadToStaging(configId, localPath, date);
+            loadToStaging(configId, date);
             transform(configId, date);
             loadToDataWarehouse(configId, date);
         } else {
@@ -49,7 +49,6 @@ public class Processor {
         FileLog fileLog = null;
         try {
             fileLog = fileLogService.findOne(configId, date);
-//            System.out.println(fileLog.getId() + "\t" + fileLog.getStatus());
             if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.extract_status")))
                 return;
             sourcePattern = configurationService.findOne(configId);
@@ -78,7 +77,7 @@ public class Processor {
         }
     }
 
-    public void loadToStaging(int configId, String localPath, Date date) {
+    public void loadToStaging(int configId, Date date) {
         IConfigurationService configurationService = new ConfigurationService();
         IFileLogService fileLogService = new FileLogService();
         ICommodityService commodityService = new CommodityService();
@@ -87,6 +86,7 @@ public class Processor {
         try {
             fileLog = fileLogService.findOne(configId, date);
             if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.extract_status"))) {
+                String localPath = fileLog.getPath();
                 sourcePattern = configurationService.findOne(configId);
                 commodityService.truncateStaging();
                 commodityService.loadToStaging(localPath);
