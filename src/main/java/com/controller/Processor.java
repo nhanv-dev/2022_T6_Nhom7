@@ -9,7 +9,6 @@ import com.util.DateFormatter;
 import com.util.LoggerUtil;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.util.*;
 
 
@@ -28,10 +27,6 @@ public class Processor {
          localPath = sourcePattern.generateLocalPath();System.out.println(localPath);
         Date date = DateFormatter.formatCreatedDate(localPath);
         fileLog = fileLogService.findOne(configId, date);
-        if (fileLog == null) {
-            fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.error_status"));
-            fileLog.setId(fileLogService.insert(fileLog));
-        }
         if (!fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.done_status"))) {
             extract(configId, authorId, date);
             loadToStaging(configId, date);
@@ -76,6 +71,7 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+
             handleError(sourcePattern,localPath, exception,  "Extract source failed");
         }
     }
@@ -99,6 +95,7 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+
             handleError(sourcePattern,localPath, exception, "Load to staging failed");
         }
     }
@@ -120,6 +117,7 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+
             handleError(sourcePattern,localPath, exception, "Transform source failed");
         }
     }
@@ -142,6 +140,7 @@ public class Processor {
         } catch (Exception exception) {
             if (fileLog != null)
                 fileLogService.updateStatus(fileLog.getId(), Configuration.getProperty("database.error_status"));
+
             handleError(sourcePattern, localPath,exception, "Load into data warehouse failed");
         }
     }

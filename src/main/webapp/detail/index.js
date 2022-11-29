@@ -5,8 +5,8 @@ axios.get(`${path}/api/commodity/${naturalKey}`, {
 }).then(response => {
     list = response.data;
     if (list.length > 0) {
-        document.title = list[0].name || "Commodity"
         generateChart()
+        window.document.title = list[0].name || "Commodity"
     }
 })
 
@@ -16,7 +16,7 @@ const generateChart = () => {
     const data = {
         labels: list.map(item => new Date(item.createdDate).toLocaleDateString("vi-VN", dateOptions)),
         datasets: [{
-            label: list[0]?.name || "Unknown Commodity",
+            label: list[0]?.name + ` (${list[0].unit})` || "Unknown Commodity",
             data: list.map(item => item.price),
             fill: true,
             borderColor: 'rgb(75, 192, 192)',

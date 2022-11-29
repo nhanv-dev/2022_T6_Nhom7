@@ -53,7 +53,6 @@ public class Backup {
             fileLogService.updateStatus(id, Configuration.getProperty("database.done_status"));
         } catch (Exception e) {
             if (id != -1) fileLogService.updateStatus(id, Configuration.getProperty("database.transform_status"));
-            e.printStackTrace();
             logger.error(e);
         }
     }

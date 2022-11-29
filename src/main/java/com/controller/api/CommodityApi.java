@@ -22,8 +22,6 @@ public class CommodityApi extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         String naturalKey = pathInfo.substring(1);
-        System.out.println(pathInfo);
-        System.out.println(naturalKey);
         ICommodityService commodityService = new CommodityService();
         List<Commodity> commodities = commodityService.findByNaturalKey(naturalKey);
         String json = GSON.toJson(commodities);
