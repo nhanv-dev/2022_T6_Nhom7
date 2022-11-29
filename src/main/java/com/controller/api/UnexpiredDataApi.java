@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "UnexpiredDataAPI", value = "/api/unexpired-data")
-public class UnexpiredDataAPI extends HttpServlet {
+public class UnexpiredDataApi extends HttpServlet {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
