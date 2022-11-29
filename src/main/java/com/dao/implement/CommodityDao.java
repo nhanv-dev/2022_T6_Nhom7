@@ -16,6 +16,11 @@ public class CommodityDao extends AbstractDao<Commodity> implements ICommodityDa
     }
 
     @Override
+    public List<Commodity> findByNaturalKey(String naturalKey) {
+        return query(Configuration.getProperty("database.find_by_natural_key"), Configuration.getProperty("database.data_warehouse"), new CommodityMapper(), naturalKey);
+    }
+
+    @Override
     public void loadToStaging(String path) {
         useProcedure(Configuration.getProperty("database.insert_into_staging"), Configuration.getProperty("database.staging"), null, path);
     }
