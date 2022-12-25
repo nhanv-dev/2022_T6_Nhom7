@@ -1,8 +1,10 @@
 package com.service.implement;
 
+import com.service.IAuthorService;
 import com.service.ISendMailError;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -92,6 +94,11 @@ public class SendErrorService implements ISendMailError {
 
     public static void main(String[] args) {
         SendErrorService a = new SendErrorService();
-        a.sendError("sendError","C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/data/tradingeconomics-20221129.csv", "tthanhnhan1512@gmail.com");
+
+        List<String> listEmail = new AuthorService().listEmailAuthor();
+        System.out.println();
+
+        a.sendError("Test","C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/data/tradingeconomics-20221129.csv",  listEmail.toArray(new String[0]));
+
     }
 }

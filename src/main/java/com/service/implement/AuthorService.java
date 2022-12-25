@@ -15,7 +15,11 @@ public class AuthorService implements IAuthorService {
         List<Author> authors = authorDao.findAllEmail();
         List<String> emails = new ArrayList<>();
         for (Author author : authors) {
-            if (author != null) emails.add(author.getEmail());
+            if (author != null) {
+                emails.add(author.getEmail());
+                System.out.println("email" + author.getEmail());
+            }
+
         }
         return emails;
     }

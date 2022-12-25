@@ -16,6 +16,7 @@ public class Processor {
     private final Logger logger = LoggerUtil.getInstance(Processor.class);
     private final ISendMailError sendMailError = new SendErrorService();
     private String localPath = "";
+    String remotePath  = "" ;
 
     public void run(int configId, int authorId) {
         IConfigurationService configurationService = new ConfigurationService();
@@ -52,6 +53,7 @@ public class Processor {
             String name = sourcePattern.generateName();
             localPath = sourcePattern.generateLocalPath();
             String remotePath = DateFormatter.generateRemoteFilePath(name);
+
             if (fileLog == null) {
                 fileLog = new FileLog(configId, authorId, localPath, DateFormatter.formatCreatedDate(localPath), Configuration.getProperty("database.error_status"));
                 fileLog.setId(fileLogService.insert(fileLog));
@@ -83,7 +85,7 @@ public class Processor {
         try {
             fileLog = fileLogService.findOne(configId, date);
             if (fileLog != null && fileLog.getStatus().equalsIgnoreCase(Configuration.getProperty("database.extract_status"))) {
-                String localPath = fileLog.getPath();
+                 localPath = fileLog.getPath();
                 sourcePattern = configurationService.findOne(configId);
                 commodityService.truncateStaging();
                 commodityService.loadToStaging(localPath);
