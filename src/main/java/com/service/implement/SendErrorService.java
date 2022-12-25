@@ -94,9 +94,11 @@ public class SendErrorService implements ISendMailError {
 
     public static void main(String[] args) {
         SendErrorService a = new SendErrorService();
+
         List<String> listEmail = new AuthorService().listEmailAuthor();
         System.out.println();
 
         a.sendError("Test","C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/data/tradingeconomics-20221129.csv",  listEmail.toArray(new String[0]));
+
     }
 }
